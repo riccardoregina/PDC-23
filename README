@@ -1,1 +1,12 @@
+ATTENZIONE:
+Il compilatore del cluster é di una versione tale che non supporta le seguenti feature del C moderno:
+  1. dichiarazione del contatore all'interno del for
+    e.g. for (int i ...
+  2. altro
+
+La libreria MPI non permette:
+  1. L'accesso a file mediante le normali funzioni fopen(), fclose() etc.
+    Sono da utilizzare invece le funzioni proprie di MPI
+  2. altro
+
 Che la forza sia con te.
