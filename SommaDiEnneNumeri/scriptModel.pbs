@@ -1,1 +1,26 @@
+#!/bin/bash
+
+#Sostituire NUMERO_DI_PROCESSORI e FILE in ogni sua istanza
+
+#PBS -q studenti
+#PBS -l nodes= NUMERO_DI_PROCESSORI
+#PBS -N FILE
+#PBS -o FILE.out
+#PBS -e FILE.err
+
+NCPU=`wc -l < $PBS_NODEFILE`
+echo ----------------------------
+echo 'This job is allocated on '${NCPU}' cpu(s)'
+echo 'Job is running on node(s): '
+cat $PBS_NODEFILE
+
+PBS_O_WORKDIR=$PBS_O_HOME/DIRECTORY_OF_FILE
+
+echo "Compilo..."
+/usr/lib64/openmpi/1.4-gcc/bin/mpicc -o $PBS_O_WORKDIR/es1 $PBS_O_WORKDIR/FILE.c
+
+echo "Eseguo..."
+/usr/lib64/openmpi/1.4-gcc/bin/mpiexec -machinefile $PBS_NODEFILE $PBS_O_WORKDIR/FILE
+#-np $NCPU questo tag sembrerebbe inutile.
+# prima, inserendolo dopo ...$PBS_O_WORKDIR/FILE stavamo in realtá passandolo come argomento al main di FILE
 
