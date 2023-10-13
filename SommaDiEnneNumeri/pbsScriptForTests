@@ -1,0 +1,32 @@
+#!/bin/bash
+
+#Sostituire NUMERO_DI_PROCESSORI, DIRECTORY_OF_FILE e FILE in ogni sua istanza
+
+#PBS -q studenti
+#per assicurarsi che ad un processo corrisponda un nodo
+#PBS -l nodes= NUMERO_DI_PROCESSORI:ppn=NUMERO_DI_PROCESSORI
+#PBS -N FILE
+#PBS -o FILE.out
+#PBS -e FILE.err
+
+#ordino le righe prendendo una sola volta quelle uguali e le metto nel file hostlist
+sort -u $PBS_NODEFILE > hostlist
+
+
+NCPU=`wc -l < hostlist` #inizializzo NCPU con il numero di righe del file hostlist
+echo ----------------------------
+echo 'This job is allocated on '${NCPU}' cpu(s)'
+echo 'Job is running on node(s): '
+cat hostlist
+#nella cat appariranno NUMERO_DI_PROCESSI righe
+
+PBS_O_WORKDIR=$PBS_O_HOME/DIRECTORY_OF_FILE
+
+echo "Compilo..."
+/usr/lib64/openmpi/1.4-gcc/bin/mpicc -o $PBS_O_WORKDIR/FILE $PBS_O_WORKDIR/FILE.c
+
+echo "Eseguo..."
+/usr/lib64/openmpi/1.4-gcc/bin/mpiexec -machinefile hostlist $PBS_NODEFILE $PBS_O_WORKDIR/FILE
+#-np $NCPU questo tag sembrerebbe inutile.
+# prima, inserendolo dopo ...$PBS_O_WORKDIR/FILE stavamo in realtá passandolo come argomento al main di FILE
+
