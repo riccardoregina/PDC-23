@@ -81,9 +81,6 @@ int main(int argc,char *argv[]){
        		sum=sum+array_locale[i];
 	  }
 
-    //dobbiamo ora scegliere le diverse strategie di comunicazione per il calcolo finale.
-
-/* 
     int sum_parziale;
     if(pid==0){
 	int i;
@@ -100,7 +97,7 @@ int main(int argc,char *argv[]){
 
     if(pid==0)
         printf("somma=%d\n",sum);
-*/
+
 
     MPI_Finalize();
 }
