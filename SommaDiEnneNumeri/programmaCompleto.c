@@ -6,35 +6,34 @@
 #define BAD_ARRAY_SIZE 20
 #define ERRORE_ALLOCAZIONE_MEMORIA 30
 void gestisciErrore(int error_code);
+int isPowerOf2(int x);
 
 int main(int argc,char *argv[])
 {    
     int pid, n_processi; //pid è il process id, n_processi è il numero di processi
     int strategy; //la strategia specificata dall'utente
     int *array_locale, start, n_locale; //il sottoarray di competenza di un processo
-    //start è l'indirizzo del primo elemento di un sottovettore
+    //start è l'indirizzo del primo elemento di un sottoarray
+    //n_locale è la dimensione del sottoarray
     int rest; //gli elementi in esubero da ridistribuire equamente ai processi
     int tag; //tag è l'identificativo di una comunicazione tra due processi
-
-    strategy = atoi(argv[1]);
-    if (strategy != 1 && strategy != 1 && strategy != 1) {
-        gestisciErrore(BAD_STRATEGY_VALUE);
-    }
-
     MPI_Status status; //indica lo stato di una comunicazione
 
-    MPI_Init(&argc, &argv);
+    strategy = atoi(argv[1]);
+    if (strategy != 1 || strategy != 2 || strategy != 3) {
+        gestisciErrore(BAD_STRATEGY_VALUE);
+        strategy = 1; //continuo lo stesso con la strategia 1
+    }
+
+    MPI_Init(&argc, &argv); //Inizio delle comunicazioni
 
     MPI_Comm_rank(MPI_COMM_WORLD, &pid);
     MPI_Comm_size(MPI_COMM_WORLD, &n_processi);
 
     //Decido la strategia
-    //Cioè vedo se n_processi è potenza di 2
-    potenzaDi2 = 0;
-    //Algoritmo per determinare se x è potenza di 2
-
+    potenzaDi2 = isPowerOf2(n_processi);
     //se strategy = 2,3 AND n_processi non è potenza di 2 ALLORA procedo con la strategia 1. 
-    if (potenzaDi2 == 1 && (strategy == 2 || strategy == 3)) {
+    if (potenzaDi2 == 0 && (strategy == 2 || strategy == 3)) {
         print "Strategie 1, 2 non applicabili: procedo con la strategia 1"
         strategy = 1;
     }
@@ -174,4 +173,9 @@ void gestisciErrore(int error_code)
     if (error_code == ERRORE_ALLOCAZIONE_MEMORIA) {
 
     }
+}
+
+int isPowerOf2(int x)
+{
+    return (x != 0) && ((x & (x - 1)) == 0);
 }
