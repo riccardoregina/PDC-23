@@ -10,25 +10,41 @@ int isPowerOf2(int x);
 
 int main(int argc,char *argv[])
 {    
+    /*
+        1) lettura di strategia
+        2) inizio delle comunicazioni MPI
+        3) Decido se la strategia e' applicabile
+        4) leggo i dati da file
+        5) allineo i processi
+        6) ogni processore esegue le somme parziali
+        7) applico una strategia di comunicazione
+        8) chiudo le comunicazioni MPI
+        9) stampo il risultato con un solo processo
+    */
+
     int pid, n_processi; //pid è il process id, n_processi è il numero di processi
     int strategy; //la strategia specificata dall'utente
-    int *array_locale, start, n_locale; //il sottoarray di competenza di un processo
+    int *array; //array che conterrà i numeri letti da file
+    int dim; // dimensione di array
+    int *array_locale, start, dim_locale; //il sottoarray di competenza di un processo
     //start è l'indirizzo del primo elemento di un sottoarray
-    //n_locale è la dimensione del sottoarray
+    //dim_locale è la dimensione del sottoarray
     int rest; //gli elementi in esubero da ridistribuire equamente ai processi
     int tag; //tag è l'identificativo di una comunicazione tra due processi
     MPI_Status status; //indica lo stato di una comunicazione
 
+
     strategy = atoi(argv[1]);
     if (strategy != 1 || strategy != 2 || strategy != 3) {
         gestisciErrore(BAD_STRATEGY_VALUE);
-        strategy = 1; //continuo lo stesso con la strategia 1
+        strategy = 1;
+        //continuo lo stesso con la strategia 1
     }
 
     MPI_Init(&argc, &argv); //Inizio delle comunicazioni
 
-    MPI_Comm_rank(MPI_COMM_WORLD, &pid);
-    MPI_Comm_size(MPI_COMM_WORLD, &n_processi);
+    MPI_Comm_rank(MPI_COMM_WORLD, &pid); //ogni processo inserisce il proprio identificativo nella variabile pid. 
+    MPI_Comm_size(MPI_COMM_WORLD, &n_processi); //Ogni processo viene a conoscenza del numero di processi.
 
     //Decido la strategia
     potenzaDi2 = isPowerOf2(n_processi);
@@ -38,47 +54,43 @@ int main(int argc,char *argv[])
         strategy = 1;
     }
 
-    //array che conterrà i numeri letti da file
-    int *x;
-    int n; // dimensione di x
-
     if (pid==0) {
         //leggi i dati dall input (n e x)
         FILE *fp;
-        fp = fopen("/homes/DMA/PDC/2024/<LOGIN>/sum/sum.txt","r");
+        fp = fopen("/homes/DMA/PDC/2024/<LOGIN>/sum/sum.txt","r"); //e' richiesto il PATH intero
 
-        fscanf(fp,"%d ",&n);
-        if (n < n_processi || n < 0) {
+        fscanf(fp,"%d ",&dim);
+        if (dim < n_processi || dim < 0) {
             gestisciErrore(BAD_ARRAY_SIZE)
             exit(1);
         }
 
-        x = malloc(n*sizeof(int));
-        if (x == NULL) {
+        array = malloc(dim*sizeof(int));
+        if (array == NULL) {
             gestisciErrore(ERRORE_ALLOCAZIONE_MEMORIA);
             exit(1);
         }
         
         int i;
-        for (i = 0; i < n; i++){
-            fscanf(fp,"%d ",&x[i]);
+        for (i = 0; i < dim; i++){
+            fscanf(fp,"%d ",&array[i]);
         }
         
         fclose(fp);
     }
 
-    MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&dim, 1, MPI_INT, 0, MPI_COMM_WORLD); //allineo i processi
 
-    n_locale = n / n_processi; //dividiamo la dimensione dell array per il numero di processi 
-    rest = n % n_processi;     //e gestiamo il resto in modo da ottenere la dimensione
+    dim_locale = dim / n_processi; //dividiamo la dimensione dell array per il numero di processi 
+    rest = dim % n_processi;     //e gestiamo il resto in modo da ottenere la dimensione
     if (pid < rest) {           // del sottoarray per ogni processo.
-        n_locale++;
+        dim_locale++;
     }
 
     int tmp;
     if (pid==0) {
-        array_locale = x;
-        tmp = n_locale;
+        array_locale = array;
+        tmp = dim_locale;
         start = 0;
         int i;
 	    for (i = 1; i < n_processi; i++){    //spezziamo l array in piu parti e mandiamo
@@ -87,26 +99,25 @@ int main(int argc,char *argv[])
             if (i == rest) {	
                 tmp--;
 		    }
-            MPI_Send(&x[start], tmp, MPI_INT, i, tag, MPI_COMM_WORLD);
+            MPI_Send(&array[start], tmp, MPI_INT, i, tag, MPI_COMM_WORLD);
         }
     }
     else
     {
         tag = 22 + pid;
-        array_locale = malloc(n_locale*sizeof(int));
-	    MPI_Recv(array_locale, n_locale, MPI_INT, 0, tag, MPI_COMM_WORLD, &status);  
+        array_locale = malloc(dim_locale*sizeof(int));
+	    MPI_Recv(array_locale, dim_locale, MPI_INT, 0, tag, MPI_COMM_WORLD, &status);  
         //i processi ricevono la propria parte.
     }
 
     //tutti i processori eseguono poi la propria somma parziale:
     int somma_parziale = 0;
     int i;
-	for (i = 0; i<n_locale; i++) {
+	for (i = 0; i<dim_locale; i++) {
        	somma_parziale = somma_parziale + array_locale[i];
 	}
 
     int somma_totale = 0;
-
     //Strategia di comunicazione
     if (strategy == 1) {
         if (pid == 0){
