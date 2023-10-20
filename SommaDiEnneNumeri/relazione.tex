@@ -1,7 +1,9 @@
 \documentclass{article}
 \usepackage{graphicx} % Required for inserting images
+\usepackage[export]{adjustbox}
 \usepackage{listings}
 \usepackage{color}
+\usepackage[textwidth=8cm]{geometry}
 
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
@@ -48,9 +50,70 @@ tabsize=3
    
 
     Andiamo dunque ad implementare la strategia di parallelizzazione in linguaggio C utilizzando una libreria per il "message passing" in un sistema MIMD (la libreria MPI).
+    \\
+    L'idea principale per la risoluzione del problema è di dividere l' array fra i vari processori.
+    Fatto questo, ogni processore dovrà calcolare la somma parziale degli elementi del suo sotto-array
+    e si dovranno poi ricostruire le varie somme parziali in maniera opportuna per ottenere la soluzione finale.\\
+    \begin{figure}[!htbp]
+        \includegraphics[width=0.3\linewidth,center]{divisione_array.drawio.png}
+        \caption{Divisione dell array in parti}
+        \label{fig:enter-label}
+    \end{figure}  
+    
+    Ipotizziamo ora di voler implementare il nostro algoritmo, individuiamo tre passi fondamentali:
+    \begin{enumerate}
+        \item dividiamo l'array in più parti e assegnamo ogni parte a un processore.
+        \item ogni processore esegue la propria somma parziale.
+        \item si ricombinano le soluzioni parziali e si ottiene la soluzione finale.
+    \end{enumerate}
 
-    SCHEMI DELLE STRATEGIE DI COMUNICAZIONE CON PASSI TEMPORALI
+    Facendo in questo modo possiamo così eseguire più somme concorrentemente, e il nostro algoritmo sarà di conseguenza più rapido.\\
+    Una prima idea sarebbe dunque quella di prendere la dimensione dell array e di dividerla per il numero dei processori utilizzati: in questo modo otteniamo (all'incirca) il numero di elementi che ogni sotto-array dovrà contenere (a meno dei resti della divisione che si dovranno poi gestire nell'implementazione).
 
+    \begin{figure}[!htbp]
+        \centering
+        \includegraphics[width=0.6\linewidth]{somme_parziali.drawio (1).png}
+        \caption{Ogni processore esegue la sua somma}
+        \label{fig:enter-label}
+    \end{figure}
+
+    Una volta eseguita la distribuzione dei dati fra i vari processori passiamo all' algoritmo vero e proprio: ogni processore non deve far altro che sommare gli elementi del proprio sotto-array producendo le somme parziali.\\
+    
+
+\subsection{Strategie di comunicazione}
+ Bisogna ora capire il modo in cui queste somme devono essere ricombinate, a tal scopo analizziamo tre possibili modalità di procedere:
+\subsubsection{Strategia I}
+    La prima strategia è la più intuitiva.
+    Consiste nel prendere le varie somme parziali e mandarle tutte ad un processore specifico: sarà lui che eseguirà la somma delle varie somme parziali e che otterrà la soluzione finale al problema.
+    Tuttavia seppur questa implementazione sia molto semplice (e funzionante in ogni caso), non rappresenta sempre la scelta più performante in quanto una volta che inviamo al processore scelto tutte le somme parziali, questo eseguirà la somme rimanenti in maniera sequenziale, mentre gli altri processori non saranno utilizzati affatto. La somma finale sarà presente dunque soltanto nella memoria del processore scelto per il calcolo finale.\\
+    Come si evince anche dalla figura, ci saranno delle somme che potevano essere parallelizzate ulteriormente...(in date condizioni). 
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=1\linewidth]{strategia_I.drawio.png}
+        \caption{Ognuno invia ad un processore}
+        \label{fig:enter-label}
+    \end{figure}
+\subsubsection{Strategia II}
+    La seconda strategia differisce dalla prima poichè i processori si dividono in coppie: uno dei due invia all'altro la propria somma parziale e l'altro ricevendo i dati aggiorna la propria somma.
+    Alla fine l'ultima coppia aggiornerà l'ultima somma parziale ottenendo il risultato finale.
+    L'ultimo processore che riceverà conterrà la somma totale.\\
+    Tuttavia ci accorgiamo subito che, in una prima analisi preliminare, l'implementazione di questa strategia fa sicuramente sì che si risparmino passi temporali preziosi, ma può essere applicata soltanto se il numero dei processori in gioco è una potenza di due. Infatti non potrei dividere i processori sempre in coppie se questa condizione non fosse soddisfatta.
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{strategia_II.drawio.png}
+    \caption{In coppie (uno manda e uno riceve)}
+    \label{fig:enter-label}
+\end{figure}
+\subsubsection{Strategia III}
+    La terza strategia è simile alla seconda: divido sempre in processori in coppia.
+    Tuttavia questa volta ogni coppia di processori si invia a vicenda la propria somma parziale e aggiornano entrambi la loro somma. Alla fine saranno tutti i processori ad avere il risultato finale in memoria.Tuttavia i passi temporali che risparmiamo sono gli stessi della strategia due, la principale differenza è infatti nel solo fatto che tutti i processori alla fine avranno la somma totale.
+    \begin{figure}[!h tbp]
+        \centering
+        \includegraphics[width=1\linewidth]{strategia_III.drawio.png}
+        \caption{In coppie (entrambi mandano e ricevono)}
+        \label{fig:enter-label}
+    \end{figure}
 \clearpage
 \section{Implementazione dell'algoritmo}
 \subsection{Header file richiamati}
@@ -148,4 +211,23 @@ int main(int argc,char *argv[]){
     MPI_Finalize();
 }
 \end{lstlisting}
+
+\section{Grafici}
+\subsection{Tempo di esecuzione}
+
+In un ambiente di calcolo parallelo con p che indica il numero di rpocessori \textit{T(P)} è il \textit{tempo di esecuzione su p processori}
+
+
+\subsection{Speed-up}
+Lo speed
+
+$$ S(P) = \frac{T(1)}{T(P)} $$
+
+\subsection{Efficienza}
+\subsection{Isoefficienza}
+
+
+$n_1 = n_0\frac{p_{1} log_{2} p_{1}}{p_{0} log_{2} p_{0}} = I(n_{0}, p_{0}, p_{1})$
+
+
 \end{document}
