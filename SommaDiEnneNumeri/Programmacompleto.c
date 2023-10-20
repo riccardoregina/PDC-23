@@ -61,7 +61,7 @@ int main(int argc,char *argv[])
     if (pid==0) {
         //leggi i dati dall input (n e x)
         FILE *fp;
-        fp = fopen("/homes/DMA/PDC/2024/TRTFNC03B/sum/sum.txt","r"); //e' richiesto il PATH intero
+        fp = fopen("/homes/DMA/PDC/2024/TRTFNC03B/sum_n_numeri/sum.txt","r"); //e' richiesto il PATH intero
 
         fscanf(fp,"%d ",&dim);
         if (dim < n_processi || dim < 0) {
@@ -124,11 +124,13 @@ int main(int argc,char *argv[])
     //--------------------------------------
 
     //tutti i processori eseguono la propria somma parziale:
-    int somma_parziale = 0;
+    int somma_parziale;
     int i;
+    int sum=0;
 	for (i = 0; i<dim_locale; i++) {
-       	somma_parziale = somma_parziale + array_locale[i];
+       	sum = sum + array_locale[i];
 	}
+    printf("sono %d e la mia somma parziale--->%d\n",pid,sum);
 
     int somma_totale = 0;
     //Strategia di comunicazione
@@ -138,13 +140,13 @@ int main(int argc,char *argv[])
             for (i = 1; i < n_processi; i++){
                 tag = 69 + i;
                 MPI_Recv(&somma_parziale, 1, MPI_INT, i, tag, MPI_COMM_WORLD, &status);
-                somma_totale = somma_totale + somma_parziale;
+                sum = sum + somma_parziale;
             }
         }
         else
         {
             tag = 69 + pid;
-            MPI_Send(&somma_parziale, 1, MPI_INT, 0, tag, MPI_COMM_WORLD);
+            MPI_Send(&sum, 1, MPI_INT, 0, tag, MPI_COMM_WORLD);
         }
     }
     else if (strategy == 2) {
@@ -185,7 +187,7 @@ int main(int argc,char *argv[])
 
     //Stampo la somma e il tempo totale di esecuzione con il processo con pid 0.
     if(pid==0){
-        printf("\nsomma=%d\n",somma_totale);
+        printf("\nsomma=%d\n",sum);
         printf("tempo totale di esecuzione--->%e\n",tempo_tot);
     }
 
