@@ -96,10 +96,10 @@ int main(int argc,char *argv[])
 	    for (i = 1; i < n_processi; i++){    //spezziamo l array in piu parti e mandiamo
             start = start + tmp;              //ad ogni processo la sua parte.
             tag = 22 + i;
+            MPI_Send(array + start*sizeof(int), tmp, MPI_INT, i, tag, MPI_COMM_WORLD);
             if (i == rest) {	
                 tmp--;
-		    }
-            MPI_Send(&array[start], tmp, MPI_INT, i, tag, MPI_COMM_WORLD);
+		}
         }
     }
     else
