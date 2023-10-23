@@ -40,7 +40,8 @@ int main(int argc,char *argv[])
     MPI_Init(&argc, &argv); //Inizio delle comunicazioni
 
     strategy = atoi(argv[1]);
-    if (strategy != 1 || strategy != 2 || strategy != 3) {
+    if(pid==0)printf("strategy before--->%d",strategy);
+    if (strategy != 1 && strategy != 2 && strategy != 3) {
         gestisciErrore(BAD_STRATEGY_VALUE);
         strategy = 1;
         //continuo lo stesso con la strategia 1
@@ -154,12 +155,13 @@ int main(int argc,char *argv[])
             if (pid % (int)pow(2,i) == 0) {
                 if (pid % (int)pow(2,i+1) == 0) {
                     tag = pid;
-                    MPI_Recv(&somma_totale, 1, MPI_INT, pid+pow(2,i), tag, MPI_COMM_WORLD, &status);
+                    MPI_Recv(&somma_parziale, 1, MPI_INT, pid+pow(2,i), tag, MPI_COMM_WORLD, &status);
+		    sum = sum + somma_parziale;
                 } 
                 else
                 {
                     tag = abs(pow(2,i) - pid);
-                    MPI_Send(&somma_parziale, 1, MPI_INT, tag, tag, MPI_COMM_WORLD);
+                    MPI_Send(&sum, 1, MPI_INT, tag, tag, MPI_COMM_WORLD);
                 }
             }
         }
@@ -167,13 +169,15 @@ int main(int argc,char *argv[])
     else if(strategy == 3){
         for (i = 0; i < log2(n_processi); i++) {
             if (pid % (int)pow(2,i+1) == 0) {
-                MPI_Recv(&somma_totale, 1, MPI_INT, pid+pow(2,i), tag, MPI_COMM_WORLD, &status);
-                MPI_Send(&somma_parziale, 1, MPI_INT, pid+pow(2,i), tag, MPI_COMM_WORLD);
+                MPI_Recv(&somma_parziale, 1, MPI_INT, pid+pow(2,i), tag, MPI_COMM_WORLD, &status);
+                MPI_Send(&sum, 1, MPI_INT, pid+pow(2,i), tag, MPI_COMM_WORLD);
+	        sum=sum+somma_parziale;
             } 
             else 
             {
-                MPI_Recv(&somma_totale, 1, MPI_INT, pid-pow(2,i), tag, MPI_COMM_WORLD, &status);
-                MPI_Send(&somma_parziale, 1, MPI_INT, pid-pow(2,i), tag, MPI_COMM_WORLD);
+                MPI_Recv(&somma_parziale, 1, MPI_INT, pid-pow(2,i), tag, MPI_COMM_WORLD, &status);
+                MPI_Send(&sum, 1, MPI_INT, pid-pow(2,i), tag, MPI_COMM_WORLD);
+		sum=sum+somma_parziale;
             }
         }
     }
@@ -187,8 +191,12 @@ int main(int argc,char *argv[])
 
     //Stampo la somma e il tempo totale di esecuzione con il processo con pid 0.
     if(pid==0){
-        printf("\nsomma=%d\n",sum);
-        printf("tempo totale di esecuzione--->%e\n",tempo_tot);
+	FILE *fp;
+	fp=fopen("/homes/DMA/PDC/2024/TRTFNC03B/sum_n_numeri/tempi.txt","a");
+	fprintf(fp,"dimensione=%d processori=%d strategia=%d\n",dim,n_processi,strategy);
+        fprintf(fp,"somma=%d\n",sum);
+        fprintf(fp,"tempo totale di esecuzione--->%e\n\n\n",tempo_tot);
+	fclose(fp);
     }
 
     //Fine delle istruzioni MPI
