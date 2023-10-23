@@ -28,3 +28,208 @@ somma=1000318
 tempo totale di esecuzione--->6.291866e-04
 
 
+dimensione=1000000 processori=8 strategia=1
+somma=1000318
+tempo totale di esecuzione--->6.268024e-04
+
+
+dimensione=1000000 processori=8 strategia=1
+somma=1000318
+tempo totale di esecuzione--->6.229877e-04
+
+
+dimensione=1000000 processori=8 strategia=1
+somma=1000318
+tempo totale di esecuzione--->5.710125e-04
+
+
+dimensione=1000000 processori=8 strategia=1
+somma=1000318
+tempo totale di esecuzione--->6.110668e-04
+
+
+dimensione=1000000 processori=8 strategia=1
+somma=1000318
+tempo totale di esecuzione--->6.079674e-04
+
+
+dimensione=1000000 processori=2 strategia=1
+somma=1000318
+tempo totale di esecuzione--->2.048969e-03
+
+
+dimensione=1000000 processori=2 strategia=1
+somma=1000318
+tempo totale di esecuzione--->2.134800e-03
+
+
+dimensione=12000000 processori=8 strategia=1
+somma=12001240
+tempo totale di esecuzione--->6.035805e-03
+
+
+dimensione=12000000 processori=8 strategia=1
+somma=12001240
+tempo totale di esecuzione--->6.038189e-03
+
+
+dimensione=12000000 processori=2 strategia=1
+somma=12001240
+tempo totale di esecuzione--->2.358794e-02
+
+
+dimensione=12000000 processori=2 strategia=1
+somma=12001240
+tempo totale di esecuzione--->2.394605e-02
+
+
+dimensione=12000000 processori=2 strategia=1
+somma=12001240
+tempo totale di esecuzione--->2.438998e-02
+
+
+dimensione=12000000 processori=2 strategia=1
+somma=12001240
+tempo totale di esecuzione--->2.367187e-02
+
+
+dimensione=12000000 processori=2 strategia=2
+somma=12001240
+tempo totale di esecuzione--->2.459502e-02
+
+
+dimensione=12000000 processori=2 strategia=2
+somma=12001240
+tempo totale di esecuzione--->2.469707e-02
+
+
+dimensione=12000000 processori=2 strategia=2
+somma=12001240
+tempo totale di esecuzione--->2.355695e-02
+
+
+dimensione=12000000 processori=2 strategia=2
+somma=12001240
+tempo totale di esecuzione--->2.364802e-02
+
+
+dimensione=12000000 processori=2 strategia=2
+somma=12001240
+tempo totale di esecuzione--->2.420378e-02
+
+
+dimensione=12000000 processori=4 strategia=1
+somma=12001240
+tempo totale di esecuzione--->1.187181e-02
+
+
+dimensione=12000000 processori=4 strategia=1
+somma=12001240
+tempo totale di esecuzione--->1.187897e-02
+
+
+dimensione=12000000 processori=4 strategia=1
+somma=12001240
+tempo totale di esecuzione--->1.188302e-02
+
+
+dimensione=12000000 processori=4 strategia=1
+somma=12001240
+tempo totale di esecuzione--->1.207209e-02
+
+
+dimensione=12000000 processori=4 strategia=1
+somma=12001240
+tempo totale di esecuzione--->1.205397e-02
+
+
+dimensione=12000000 processori=4 strategia=1
+somma=12001240
+tempo totale di esecuzione--->1.187801e-02
+
+
+dimensione=12000000 processori=4 strategia=2
+somma=12001240
+tempo totale di esecuzione--->1.202512e-02
+
+
+dimensione=12000000 processori=4 strategia=2
+somma=12001240
+tempo totale di esecuzione--->1.205587e-02
+
+
+dimensione=12000000 processori=4 strategia=2
+somma=12001240
+tempo totale di esecuzione--->1.208210e-02
+
+
+dimensione=12000000 processori=4 strategia=2
+somma=12001240
+tempo totale di esecuzione--->1.206589e-02
+
+
+dimensione=12000000 processori=4 strategia=2
+somma=12001240
+tempo totale di esecuzione--->1.189804e-02
+
+
+dimensione=12000000 processori=4 strategia=2
+somma=12001240
+tempo totale di esecuzione--->1.203704e-02
+
+
+dimensione=12000000 processori=8 strategia=1
+somma=12001240
+tempo totale di esecuzione--->6.093025e-03
+
+
+dimensione=12000000 processori=8 strategia=1
+somma=12001240
+tempo totale di esecuzione--->6.073952e-03
+
+
+dimensione=12000000 processori=8 strategia=1
+somma=12001240
+tempo totale di esecuzione--->6.090879e-03
+
+
+dimensione=12000000 processori=8 strategia=1
+somma=12001240
+tempo totale di esecuzione--->6.089926e-03
+
+
+dimensione=12000000 processori=8 strategia=1
+somma=12001240
+tempo totale di esecuzione--->6.091118e-03
+
+
+dimensione=12000000 processori=8 strategia=1
+somma=12001240
+tempo totale di esecuzione--->6.074905e-03
+
+
+dimensione=12000000 processori=8 strategia=2
+somma=12001240
+tempo totale di esecuzione--->6.052017e-03
+
+
+dimensione=12000000 processori=8 strategia=2
+somma=12001240
+tempo totale di esecuzione--->6.057024e-03
+
+
+dimensione=12000000 processori=8 strategia=2
+somma=12001240
+tempo totale di esecuzione--->6.057024e-03
+
+
+dimensione=12000000 processori=8 strategia=2
+somma=12001240
+tempo totale di esecuzione--->6.157160e-03
+
+
+dimensione=12000000 processori=8 strategia=2
+somma=12001240
+tempo totale di esecuzione--->6.047964e-03
+
+
