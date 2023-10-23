@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #include "mpi.h"
 
 #define BAD_STRATEGY_VALUE 10
@@ -62,7 +63,7 @@ int main(int argc,char *argv[])
     if (pid==0) {
         //leggi i dati dall input (n e x)
         FILE *fp;
-        fp = fopen("/homes/DMA/PDC/2024/TRTFNC03B/sum_n_numeri/sum.txt","r"); //e' richiesto il PATH intero
+        fp = fopen("/homes/DMA/PDC/2024/RGNRCR04F/sum/sum.txt","r"); //e' richiesto il PATH intero
 
         fscanf(fp,"%d ",&dim);
         if (dim < n_processi || dim < 0) {
@@ -168,17 +169,17 @@ int main(int argc,char *argv[])
     }
     else if(strategy == 3){
         for (i = 0; i < log2(n_processi); i++) {
-            if (pid % (int)pow(2,i+1) == 0) {
-                MPI_Recv(&somma_parziale, 1, MPI_INT, pid+pow(2,i), tag, MPI_COMM_WORLD, &status);
+            int mod = pow(2,i+1);
+            if (pid % mod < pow(2,i)) {
+                tag = pid;
                 MPI_Send(&sum, 1, MPI_INT, pid+pow(2,i), tag, MPI_COMM_WORLD);
-	        sum=sum+somma_parziale;
-            } 
-            else 
-            {
-                MPI_Recv(&somma_parziale, 1, MPI_INT, pid-pow(2,i), tag, MPI_COMM_WORLD, &status);
+                MPI_Recv(&somma_parziale, 1, MPI_INT, pid+pow(2,i), tag, MPI_COMM_WORLD, &status);
+            } else {
+                tag = pid - pow(2,i);
                 MPI_Send(&sum, 1, MPI_INT, pid-pow(2,i), tag, MPI_COMM_WORLD);
-		sum=sum+somma_parziale;
+                MPI_Recv(&somma_parziale, 1, MPI_INT, pid-pow(2,i), tag, MPI_COMM_WORLD, &status);
             }
+            sum=sum+somma_parziale; //la somma la faccio comunque
         }
     }
 
@@ -192,7 +193,7 @@ int main(int argc,char *argv[])
     //Stampo la somma e il tempo totale di esecuzione con il processo con pid 0.
     if(pid==0){
 	FILE *fp;
-	fp=fopen("/homes/DMA/PDC/2024/TRTFNC03B/sum_n_numeri/tempi.txt","a");
+	fp=fopen("/homes/DMA/PDC/2024/RGNRCR04F/sum/tempi.txt","a");
 	fprintf(fp,"dimensione=%d processori=%d strategia=%d\n",dim,n_processi,strategy);
         fprintf(fp,"somma=%d\n",sum);
         fprintf(fp,"tempo totale di esecuzione--->%e\n\n\n",tempo_tot);
@@ -205,17 +206,19 @@ int main(int argc,char *argv[])
 }
 
 void gestisciErrore(int error_code)
-{
+{   
+    FILE* fp = fopen("/homes/DMA/PDC/2024/RGNRCR04F/sum/sum.err","a")
     if (error_code == BAD_STRATEGY_VALUE) {
         //Stampo nel file di errori l'errore trovato.
+        fprintf(fp, "Errore nell'inserimento di 'strategy'.\n");
     }
     else
     if (error_code == BAD_ARRAY_SIZE) {
-
+        fprintf(fp, "Errore nell'inserimento di 'dim'.\n");
     }
     else
     if (error_code == ERRORE_ALLOCAZIONE_MEMORIA) {
-
+        fprintf(fp, "Errore di allocazione in memoria.\n");
     }
 }
 
