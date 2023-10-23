@@ -1,0 +1,30 @@
+dimensione=1000000 processori=8 strategia=1
+somma=1000318
+tempo totale di esecuzione--->6.139278e-04
+
+
+dimensione=1000000 processori=8 strategia=1
+somma=1000318
+tempo totale di esecuzione--->5.791187e-04
+
+
+dimensione=1000000 processori=8 strategia=1
+somma=1000318
+tempo totale di esecuzione--->5.781651e-04
+
+
+dimensione=1000000 processori=8 strategia=1
+somma=1000318
+tempo totale di esecuzione--->6.299019e-04
+
+
+dimensione=1000000 processori=8 strategia=1
+somma=1000318
+tempo totale di esecuzione--->6.241798e-04
+
+
+dimensione=1000000 processori=8 strategia=1
+somma=1000318
+tempo totale di esecuzione--->6.291866e-04
+
+
