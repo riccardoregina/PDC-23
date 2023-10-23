@@ -247,5 +247,36 @@ dimensione=4000000 processori=4 strategia=1
 somma=4000391
 tempo totale di esecuzione--->4.027128e-03
 
+dimensione=1000000 processori=4 strategia=1
+somma=999947
+tempo totale di esecuzione--->1.072168e-03
+
+
+dimensione=1000000 processori=4 strategia=1
+somma=999947
+tempo totale di esecuzione--->1.068115e-03
+
+
+dimensione=1000000 processori=4 strategia=1
+somma=999947
+tempo totale di esecuzione--->1.066923e-03
+
+
+dimensione=1000000 processori=4 strategia=2
+somma=999947
+tempo totale di esecuzione--->1.078129e-03
+
+
+dimensione=1000000 processori=4 strategia=2
+somma=999947
+tempo totale di esecuzione--->1.078844e-03
+
+
+dimensione=1000000 processori=4 strategia=2
+somma=999947
+tempo totale di esecuzione--->1.078129e-03
+
+
+
 
 
