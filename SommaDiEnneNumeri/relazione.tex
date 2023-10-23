@@ -3,7 +3,6 @@
 \usepackage[export]{adjustbox}
 \usepackage{listings}
 \usepackage{color}
-\usepackage[textwidth=8cm]{geometry}
 
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
@@ -215,8 +214,10 @@ int main(int argc,char *argv[]){
 \section{Grafici}
 \subsection{Tempo di esecuzione}
 
-Il numero di operazioni coincide con il numero di passi temporali. Nel caso in cui si debbano sommare N numeri, il numero di operazioni di somma, in un sistema biprocessore è N-1. Il numero di passi temporali invece sono: $$ \frac{N}{2} +1. $$Da ciò comprendiamo che il tempo di esecuzione non è proporzionale(quindi inutile) alla complessità di tempo.
-In un ambiente di calcolo parallelo con P che indica il numero di processori, un problema che si risolve in un tempo T ci darà che, \textit{T(P)} è il \textit{tempo di esecuzione su p processori}. Il problema si svolgerà in $$ \frac{T}{P}. $$ \\
+Nell' approccio a calcolare il tempo di esecuzione di un algoritmo parallelo, la grandezza note come complessità di tempo (utile nell analisi del tempo di esecuzione di un algoritmo sequenziale) diventa inutilizzabile.\\
+In un algoritmo parallelo il numero delle operazioni non coincide più con il numero dei passi temporali, di conseguenza si introducono nuove grandezze al fine di realizzare un analisi degli algoritmi paralleli. Nel caso particolare in cui si debbano sommare N numeri, il numero di operazioni di somma da effettuare è N-1.
+
+In un ambiente di calcolo parallelo con P che indica il numero di processori, un problema che si risolve in un tempo T ci darà che, \textit{T(P)} è il \textit{tempo di esecuzione su p processori}. Il problema si svolgerà (idealmente) in $$ \frac{T}{P}. $$ \\
 
 Osservando una successione:
 
