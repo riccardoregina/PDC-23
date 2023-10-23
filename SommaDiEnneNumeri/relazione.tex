@@ -215,15 +215,65 @@ int main(int argc,char *argv[]){
 \section{Grafici}
 \subsection{Tempo di esecuzione}
 
-In un ambiente di calcolo parallelo con p che indica il numero di rpocessori \textit{T(P)} è il \textit{tempo di esecuzione su p processori}
+Il numero di operazioni coincide con il numero di passi temporali. Nel caso in cui si debbano sommare N numeri, il numero di operazioni di somma, in un sistema biprocessore è N-1. Il numero di passi temporali invece sono: $$ \frac{N}{2} +1. $$Da ciò comprendiamo che il tempo di esecuzione non è proporzionale(quindi inutile) alla complessità di tempo.
+In un ambiente di calcolo parallelo con P che indica il numero di processori, un problema che si risolve in un tempo T ci darà che, \textit{T(P)} è il \textit{tempo di esecuzione su p processori}. Il problema si svolgerà in $$ \frac{T}{P}. $$ \\
+
+Osservando una successione:
+
+$$|p| |T| |T|$$
+$$|-| |-| |-|$$
+$$|1| |15| |-|$$
+$$|2| |8| |7+1|$$
+$$|4| |5| |3+1|$$
+$$|8| |4| |1+3|$$
+
+Da tale successione ricaviamo la form
+$$T(p)=(\frac{n}{p}-1 + \log_2(p))t_{calc} $$
 
 
-\subsection{Speed-up}
-Lo speed
+\subsection{Speed-up e Efficienza}
 
-$$ S(P) = \frac{T(1)}{T(P)} $$
+Lo \textbf{Speed- up} misura la riduzione del tempo di esecuzione rispetto all'algoritmo su 1 processore ed è definito dal rapporto:
+$$ S(P) = \frac{T(1)}{T(P)} $$ 
 
-\subsection{Efficienza}
+Se S(p) è ideale, possiamo scrivere
+$$ 
+\begin{cases} 
+S(p) = \frac{T(1)}{T(p)}\\
+S(p) = p
+\end{cases}
+\rightarrow
+\frac{T(1)}{T(p)} = p \iff pT(p) -T(1) = 0
+$$
+Chiamo  $O_h(p) = pT(p) - T(1)$ overhead. Come visto, esso è al meno 0.\\
+\\
+Riformulando possiamo far vedere che lo speed-up è ideale $\iff$ l'overhead è nullo.\\
+Quindi possiamo dire che O  misura quanto lo speed-up differisce da quello ideale.
+
+Lo speed-up che noi vogliamo ottenere è sempre più prossimo a quello che si definisce come speed-up ideale.
+Lo speed-up più vicino a quello ideale è quello nel caso di 2 processori. Ma sappiamo che non è la situazione più efficiente
+
+Per poter misurare se e quanto è stato "sfruttato" il calcolatore parallelo dobbiamo calcolare l'efficienza del nostro algoritmo.
+Si definisce \textbf{efficienza} il rapporto che risulta essere: $$ E(p) = \frac{S(p)}{p} $$\\
+In generale ci risulta che $$ E(p) < 1 = \frac{S^{ideale}(p)}{p} = E^{ideale} $$\\
+Per avvicinarsi allo speed-up ideale, $T(1)$ può essere pensata come somma di operazioni eseguite in maniera sequenziale ed operazioni eseguite concorrentemente.\\
+Quindi scriviamo $T(1)=T_s + T_c$
+\\
+\\
+Ma $T_c$ indica le operazioni che possono essere eseguite da $p$ processori $\rightarrow T(1)= T_s + \frac{T_c}{p}$.
+Vediamo adesso la somma di 4 numeri con 2 processori:\\
+$T_s = 2t_{calc} \wedge T_c = 2t_{calc}$
+\\
+\\
+Pongo $T(1)=1$, $T_s=\alpha$, $T_c = 1-\alpha$ e ottengo $O_h = (p-1)\alpha$\\
+Adesso, l'efficienza diventa:
+$E(p)=\frac{1}{(p-1)\alpha + 1}$
+\\
+\\
+Ricavo lo speed-up (legge di Ware-Amdahl):
+$S(p)=p\cdot E(p)=\frac{1}{\alpha + \frac{1-\alpha}{p}}$ in seguito a dei passaggi algebrici.
+Notiamo che per $p\rightarrow \infty$, $S(p)\rightarrow \frac{1}{\alpha}$
+
 \subsection{Isoefficienza}
 
 
