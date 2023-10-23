@@ -233,3 +233,19 @@ somma=12001240
 tempo totale di esecuzione--->6.047964e-03
 
 
+dimensione=4000000 processori=4 strategia=2
+somma=4000391
+tempo totale di esecuzione--->4.174948e-03
+
+
+dimensione=4000000 processori=4 strategia=2
+somma=4000391
+tempo totale di esecuzione--->4.045010e-03
+
+
+dimensione=4000000 processori=4 strategia=1
+somma=4000391
+tempo totale di esecuzione--->4.027128e-03
+
+
+
