@@ -1,12 +1,122 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "mpi.h"
 
-void crea_griglia(MPI_Comm *griglia, MPI_Comm *griglia_r, MPI_Comm *griglia_c,int pid,int row, int col, int *coordinate){
+void copiaInSottomatrice(int** M, int** localM, int startX, int startY, int localRow, int localCol);
+void crea_griglia(MPI_Comm *griglia, MPI_Comm *griglia_r, MPI_Comm *griglia_c,int pid,int rowGriglia, int colGriglia, int *coordinate);
+int **readMatrixFromFile(int **M,char *s,int *row,int *col);
+void stampaSottoMatrice(int** M, int localRow, int localCol, int pid, int x, int y);
+
+
+int main(int argc, char *argv[]){
+
+    int pid;
+    int n_processi;
+    MPI_Status status;
+
+    MPI_Init(&argc,&argv);
+    MPI_Comm_rank(MPI_COMM_WORLD,&pid);
+    MPI_Comm_size(MPI_COMM_WORLD,&n_processi);
+
+    int rowGriglia=atoi(argv[1]);
+    n_processi=atoi(argv[2]);
+
+    int colGriglia= ((n_processi%rowGriglia)==0)? n_processi/rowGriglia : n_processi/(rowGriglia=rowGriglia-(n_processi%rowGriglia));
+
+    MPI_Comm griglia,griglia_r,griglia_c;
+    int coordinate[2];
+
+    crea_griglia(&griglia,&griglia_r,&griglia_c,pid,rowGriglia,colGriglia,coordinate);
+
+    //leggo la matrice da file
+    int **M;
+    int row,col;
+    /*
+    if(coordinate[0] == 0 && coordinate[1] == 0){
+        M=readMatrixFromFile(M,"...",&row,&col);
+    }
+    */
+    
+    M=readMatrixFromFile(M,"/homes/DMA/PDC/2024/RGNRCR04F/prodottoMatriceVettore/matrix.txt",&row,&col);
+
+    //capisco le dimensioni dei sottoblocchi
+    int localRow,localCol;  
+    localRow= row/rowGriglia;
+    localCol= col/colGriglia;
+
+    int restRow= row%rowGriglia; //resto delle righe
+    int restCol= col%colGriglia; //resto delle colonne
+
+    //distribuisco il resto delle righe, colonne
+    if(coordinate[0] < restRow) {
+        localRow++;
+    }
+    if (coordinate[1] < restCol) {
+        localCol++;
+    }
+
+    //ogni processo alloca la sua sottomatrice
+    int **M_locale=malloc(localRow*sizeof(int *));
+    int i=0;
+    for(i=0;i<localRow;i++){
+        M_locale[i]=malloc(localCol*sizeof(int));
+    }
+
+    //divido la matrice per blocchi ed assegno ciascun blocco ad un processo
+    int dest, tag1, tag2;
+    int startX, startY;
+    #define OFFSET 10
+    if(coordinate[0] == 0 && coordinate[1] == 0){
+        int x, y;
+        startX = 0;
+        for (x = 0; x < rowGriglia; x++) {
+            startY = 0;
+            for (y = 0; y < colGriglia; y++) {
+                if (x != 0 || y != 0) {
+                    dest = x*colGriglia + y;
+                    tag1 = OFFSET + dest;
+                    tag2 = OFFSET - dest;
+                    MPI_Send(&startX, 1, MPI_INT, dest, tag1, griglia); //modifica
+                    MPI_Send(&startY, 1, MPI_INT, dest, tag2, griglia);
+                }
+                if (y < restCol) {
+                    startY += col/colGriglia + 1;
+                } else {
+                    startY += col/colGriglia;
+                }
+            }
+            if (x < restRow) { //potra essere sostituita da una variabile temp
+                startX += row/rowGriglia + 1;
+            } else {
+                startX += row/rowGriglia;
+            }
+        }
+    } else {
+        tag1 = OFFSET + pid;
+        tag2 = OFFSET - pid;
+        MPI_Recv(&startX, 1, MPI_INT, 0, tag1, griglia, &status);
+        MPI_Recv(&startY, 1, MPI_INT, 0, tag2, griglia, &status);
+    }
+    
+    if (coordinate[0] == 0 && coordinate[1] == 0) {
+        copiaInSottomatrice(M, M_locale, 0, 0, localRow, localCol);
+    } else {
+        copiaInSottomatrice(M, M_locale, startX, startY, localRow, localCol);
+    }
+
+    stampaSottoMatrice(M_locale, localRow, localCol, pid, coordinate[0], coordinate[1]);
+
+    MPI_Finalize();
+
+    return 0;
+}
+
+void crea_griglia(MPI_Comm *griglia, MPI_Comm *griglia_r, MPI_Comm *griglia_c,int pid,int rowGriglia, int colGriglia, int *coordinate){
     int dim=2;
 
     int ndims[2];
-    ndims[0]=row;
-    ndims[1]=col;
+    ndims[0]=rowGriglia;
+    ndims[1]=colGriglia;
 
     int periods[2];
     periods[0]=periods[1]=0;
@@ -32,22 +142,22 @@ void crea_griglia(MPI_Comm *griglia, MPI_Comm *griglia_r, MPI_Comm *griglia_c,in
     return;
 }
 
-int **readMatrixFromFile(int **M,char *s,int *r_m,int *c_m){
+int **readMatrixFromFile(int **M,char *s,int *row,int *col){
     FILE *fp;
     fp=fopen(s,"r");
 
-    fscanf("%d %d",r_m,c_m);
+    fscanf(fp, "%d %d",row,col);
 
-    int **M=malloc((*r_m)*sizeof(int *));
+    M=malloc((*row)*sizeof(int *));
     int k;
-    for(k=0;k<(*r_m);k++){
-        M[k]=malloc((*c_m)*sizeof(int));
+    for(k=0;k<(*row);k++){
+        M[k]=malloc((*col)*sizeof(int));
     }
 
     int i,j;
-    for(i=0;i<(*r_m);i++){
-        for(j=0;j<(*c_m);j++){
-            fscanf("%d",&(M[i][j]));
+    for(i=0;i<(*row);i++){
+        for(j=0;j<(*col);j++){
+            fscanf(fp, "%d",&(M[i][j]));
         }
     }
 
@@ -55,84 +165,23 @@ int **readMatrixFromFile(int **M,char *s,int *r_m,int *c_m){
     return M;
 }
 
-int main(int argc, char *argv[]){
-
-    int pid;
-    int n_processi;
-
-    MPI_Init(&argc,&argv);
-    MPI_Comm_rank(MPI_COMM_WORLD,&pid);
-    MPI_Comm_size(MPI_COMM_WORLD,&n_processi);
-
-    int row=atoi(argv[1]);
-
-    int col= ((n_processi%row)==0)? n_processi/row : n_processi/(row=row-(n_processi%row));
-
-
-    MPI_Comm griglia,griglia_r,griglia_c;
-    int coordinate[2];
-
-    crea_griglia(&griglia,&griglia_r,&griglia_c,pid,row,col,coordinate);
-
-    //leggo la matrice da file
-    int **M;
-    int r_m,c_m;
-    if(pid==0){
-        M=readMatrixFromFile(M,"...",&r_m,&c_m);
-    }
-    //divido la matrice per blocchi
-
-    int loc_r_m,loc_c_m;
-        //capisco le dimensioni dei sottoblocchi
-    
-    loc_r_m= r_m/row;
-    loc_c_m= c_m/col;
-
-    rest1= r_m%row; //resto delle righe
-    rest2= c_m%col; //resto delle colonne
-
-    if(pid<rest1){
-        loc_r_m++;  
-    }               //assegno le colonne e righe in piu
-    if(pid<rest2){
-        loc_c_m++;
-    }
-
-    int **M_loc=malloc(loc_r_m*sizeof(int *))
-    int i=0;
-    for(i=0;i<loc_r_m;i++){
-        M_loc[i]=malloc(loc_c_m*sizeof(int));
-    }
-
-    if(pid==0){
-        int tag;
-        int temp1=loc_r_m;
-        int temp2=loc_c_m;
-        int start1=0;
-        int start2=0;
-        for(i=1;i<n_processi;i++){
-            if(i==rest1)
-                temp1--;
-            int k;
-            for(k=0;k<temp1; k++) {
-                tag = 30 + i*loc_r_m + k; //i*loc_r_m per evitare l intersezione dei tag
-                MPI_Send(M[start+k]);
-            }
-            start+temp1;
+void copiaInSottomatrice(int** M, int** localM, int startX, int startY, int localRow, int localCol) {
+    int i, j;
+    for (i = 0; i < localRow; i++) {
+        for (j = 0; j < localCol; j++) {
+            localM[i][j] = M[i + startX][j + startY];
         }
     }
-    else{
-        //ricevi
-        for(i=0;i<loc_r_m;i++){
-            tag=30 + pid*loc_r_m + i;
-            MPI_Recv(&M_loc[i],tag,...); 
+}
+
+void stampaSottoMatrice(int** M, int localRow, int localCol, int pid, int x, int y) {
+    printf("Sono %d con coordinate (%d,%d).\n", pid, x, y);
+    int i, j;
+    for (i = 0; i < localRow; i++) {
+        for (j = 0; j < localCol; j++) {
+            printf("%d ", M[i][j]);
         }
+        printf("\n");
     }
-
-
-
-
-    MPI_Finalize();
-
-
+    printf("\n");
 }
