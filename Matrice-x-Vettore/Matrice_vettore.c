@@ -1,3 +1,9 @@
+/*
+    Note: per la distribuzione del vettore si potrebbe
+    utilizzare la funzione MPI_Scatter.
+
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,6 +11,7 @@
 
 void copiaInSottomatrice(int** M, int** localM, int startX, int startY, int localRow, int localCol);
 void crea_griglia(MPI_Comm *griglia, MPI_Comm *griglia_r, MPI_Comm *griglia_c,int pid,int rowGriglia, int colGriglia, int *coordinate);
+int* readVectorFromFile(int* V, const char* path, int dim);
 int **readMatrixFromFile(int **M,char *s,int *row,int *col);
 void stampaSottoMatriceSuFile(FILE* fp, int** M, int localRow, int localCol, int pid, int x, int y);
 
@@ -92,12 +99,12 @@ int main(int argc, char *argv[]){
         MPI_Recv(&startX, 1, MPI_INT, 0, tag1, griglia, &status);
         MPI_Recv(&startY, 1, MPI_INT, 0, tag2, griglia, &status);
     }
-    
-    if (coordinate[0] == 0 && coordinate[1] == 0) {
-        copiaInSottomatrice(M, M_locale, 0, 0, localRow, localCol);
-    } else {
-        copiaInSottomatrice(M, M_locale, startX, startY, localRow, localCol);
+
+    if (coordinate[0] == 0 && coordinate[1] == 0) { //per consistenza semantica
+        startX = startY = 0;
     }
+    
+    copiaInSottomatrice(M, M_locale, startX, startY, localRow, localCol);
 
     //Per evitare scritture confuse su unico stream, do a ciascun processo un proprio stream su cui stampare la propria sottomatrice
     #define DimString 70
@@ -107,6 +114,50 @@ int main(int argc, char *argv[]){
     FILE* fp = fopen(s, "w");
     stampaSottoMatriceSuFile(fp, M_locale, localRow, localCol, pid, coordinate[0], coordinate[1]);
     fclose(fp);
+
+    //devo dare a ciascun processo la parte di sua competenza del vettore x
+    int* x;
+    int dimX = col;
+
+    //assegno il sottovettore di competenza
+    x = readVectorFromFile(x, "/homes/DMA/PDC/2024/RGNRCR04F/prodottoMatriceVettore/vettore.txt", dimX);
+    int localDimX = localCol;
+    
+
+    //alloco il vettore risultato, y
+    int* y;
+    int dimY = row;
+    y = calloc(dimY, sizeof(int));
+    int localDimY = localRow;
+
+    //eseguo il prodotto
+    //startX é offset per y, mentre startY lo é per x
+    int j;
+    for (i = 0; i < localRow; i++) {
+        for (j = 0; j < localCol; j++) {
+            y[i + startX] += M_locale[i][j] * x[j + startY];
+        }
+    }
+
+    //devo combinare i risultati parziali
+    //prima sommo sulle righe
+    int* result;
+    if (coordinate[0] == 0 && coordinate[1] == 0) {
+        result = calloc(dimY, sizeof(int));
+    }
+    MPI_Reduce(y, result, dimY, MPI_INT, MPI_SUM, 0, griglia_r);
+
+    //poi riunisco sulle colonne
+    MPI_Gather(y, dimY, MPI_INT, y, dimY, MPI_INT, 0, griglia_c);
+
+    //faccio stampare il vettore risultante a 0
+    if (pid == 0) {
+        printf("y = (");
+        for (i = 0; i < dimY; i++) {
+            printf("%d ", y[i]);
+        }
+        printf(")\n");
+    }
 
     MPI_Finalize();
 
@@ -165,6 +216,22 @@ int **readMatrixFromFile(int **M,char *s,int *row,int *col){
 
     fclose(fp);
     return M;
+}
+
+int* readVectorFromFile(int* V, const char* path, int dim) {
+    FILE *fp;
+    fp = fopen(path, "r");
+
+    V = malloc(dim * sizeof(int));
+
+    //dovrei controllare la dimensione per acchiappare eventuali eccezioni
+    int i;
+    for (i = 0; i < dim; i++) {
+        fscanf(fp, "%d", &(V[i]));
+    }
+
+    fclose(fp);
+    return V;
 }
 
 void copiaInSottomatrice(int** M, int** localM, int startX, int startY, int localRow, int localCol) {
