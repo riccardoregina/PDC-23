@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "mpi.h"
 
 void copiaInSottomatrice(int** M, int** localM, int startX, int startY, int localRow, int localCol);
 void crea_griglia(MPI_Comm *griglia, MPI_Comm *griglia_r, MPI_Comm *griglia_c,int pid,int rowGriglia, int colGriglia, int *coordinate);
 int **readMatrixFromFile(int **M,char *s,int *row,int *col);
-void stampaSottoMatrice(int** M, int localRow, int localCol, int pid, int x, int y);
+void stampaSottoMatriceSuFile(FILE* fp, int** M, int localRow, int localCol, int pid, int x, int y);
 
 
 int main(int argc, char *argv[]){
@@ -31,12 +32,6 @@ int main(int argc, char *argv[]){
     //leggo la matrice da file
     int **M;
     int row,col;
-    /*
-    if(coordinate[0] == 0 && coordinate[1] == 0){
-        M=readMatrixFromFile(M,"...",&row,&col);
-    }
-    */
-    
     M=readMatrixFromFile(M,"/homes/DMA/PDC/2024/RGNRCR04F/prodottoMatriceVettore/matrix.txt",&row,&col);
 
     //capisco le dimensioni dei sottoblocchi
@@ -104,7 +99,14 @@ int main(int argc, char *argv[]){
         copiaInSottomatrice(M, M_locale, startX, startY, localRow, localCol);
     }
 
-    stampaSottoMatrice(M_locale, localRow, localCol, pid, coordinate[0], coordinate[1]);
+    //Per evitare scritture confuse su unico stream, do a ciascun processo un proprio stream su cui stampare la propria sottomatrice
+    #define DimString 70
+    char* s = malloc(DimString * sizeof(char));
+    sprintf(s, "/homes/DMA/PDC/2024/RGNRCR04F/prodottoMatriceVettore/sottoMatrice%d.txt", pid);
+    printf("%s\n", s);
+    FILE* fp = fopen(s, "w");
+    stampaSottoMatriceSuFile(fp, M_locale, localRow, localCol, pid, coordinate[0], coordinate[1]);
+    fclose(fp);
 
     MPI_Finalize();
 
@@ -174,14 +176,14 @@ void copiaInSottomatrice(int** M, int** localM, int startX, int startY, int loca
     }
 }
 
-void stampaSottoMatrice(int** M, int localRow, int localCol, int pid, int x, int y) {
-    printf("Sono %d con coordinate (%d,%d).\n", pid, x, y);
+void stampaSottoMatriceSuFile(FILE* fp, int** M, int localRow, int localCol, int pid, int x, int y) {    
+    fprintf(fp, "Sono %d con coordinate (%d,%d).\n", pid, x, y);
     int i, j;
     for (i = 0; i < localRow; i++) {
         for (j = 0; j < localCol; j++) {
-            printf("%d ", M[i][j]);
+            fprintf(fp, "%d ", M[i][j]);
         }
-        printf("\n");
+        fprintf(fp, "\n");
     }
-    printf("\n");
+    fprintf(fp, "\n");
 }
