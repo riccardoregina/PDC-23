@@ -1,0 +1,19 @@
+Il programma deve essere eseguito mediante un job script contenente direttive pbs (portable batch system).
+
+Un esempio di jobscript:
+\begin{lstlisting}
+INSERIRE SCRIPT PER OMP
+\end{lstlisting}
+
+Una volta scritto il job script, per eseguirlo, bisognerà eseguire da terminale il comando 
+\begin{lstlisting}
+qsub FILE.pbs
+\end{lstlisting}
+
+In caso l'esecuzione dello script vada a buon fine, verranno generati FILE.out e FILE.err, i file di output e errore rispettivamente.
+
+Per andare a visualizzare tali file, bisognerà eseguire da terminale i comandi
+\begin{lstlisting}
+cat FILE.err
+cat FILE.out
+\end{lstlisting}

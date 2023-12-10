@@ -1,0 +1,110 @@
+\subsection{Header file richiamati}
+\begin{lstlisting}
+#include <omp.h>
+#include <stdio.h>
+#include <stdlib.h>
+\end{lstlisting}
+
+\subsection{Main}
+Nel blocco del main, ovvero il punto di ingresso del programma, viene in primis effettuata la dichiarazione della matrice $A$ e delle sue dimensione $m$, $n$, del vettore $x$ di dimensione $dim$.
+Viene controllato se $dim$ e $n$ coincidano, ovvero se il prodotto è ben definito.
+A questo punto, se il controllo è andato  a buon fine, viene chiamata la funzione centrale del programma.
+Infine, viene eseguita la stampa del vettore $y$ risultante.
+
+\begin{lstlisting}
+int main(){
+    int m, n;
+    double **A = readMatrixFromFile("<path>", &m, &n);
+
+    int dim;
+    double *x = readVector("<path>", &dim);
+
+    if(dim != n){
+        printf("Vettore e matrice non hanno dimensioni adeguate per una moltiplicazione...");
+        exit(-1);
+    }
+    
+    double *y = matrixVector(m, n, x, A);
+    printVector(y, m);
+
+    return 0;
+}
+\end{lstlisting}
+
+\subsection{Algoritmo}
+La direttiva omp \textit{\#pragma} indica l'inizio di un blocco parallelo: essa genera un team di thread, sottoprocessi che condividono la stessa area di memoria. Pertanto, è importante specificare ai thread quali saranno le variabili condivise, accessibili a tutti e regolate da un semaforo di sistema, e quali private, sempre sovrascrivibili perché indipendenti. 
+
+Per decidere manualmente la visibilitá delle variabili é stata usata la direttiva \textit{default(none)}
+Le variabili condivise sono le dimensioni della matrice e dei vettori, che devono poter essere visualizzate in ogni istante della computazione da ciascun thread.
+Le variabili private sono gli indici dei due cicli for innestati. Ogni thread compierà le proprie iterazioni indipendenti.
+Per la distribuzione delle iterazioni del for-statement, si è usata una specifica direttiva  standard di omp: \textit{\#pragma...for...}. 
+La funzione infine restituirà al main l'indirizzo di memoria del vettore risultante $y$.
+\begin{lstlisting}
+double *matrixVector(int m, int n, double *x, double **A){
+    
+    double *y = calloc(m, sizeof(double));
+    int i, j;
+    #pragma omp parallel for default(none) shared(m,n,x,A,y) private(i,j)
+        for (i = 0; i < m; i++){
+            for (j = 0; j < n; j++){
+                y[i] += A[i][j] * x[j];
+            }
+        }
+    return y;
+}
+\end{lstlisting}
+
+\subsection{Funzioni accessorie}
+Mostriamo adesso le altre funzioni utilizzate nel blocco del main.
+\subsubsection{Lettura da file della matrice e del vettore}
+\begin{lstlisting}
+double **readMatrixFromFile(char *path, int *m, int *n){
+    FILE *fp;
+    fp = fopen(path,"r");
+    int i,j;
+
+    fscanf(fp, "%d %d", m, n);
+
+    double **A = malloc((*m) * sizeof(double *));
+    for (i = 0; i < (*m); i++)
+        A[i] = malloc((*n) * sizeof(double));
+
+    
+    for (i = 0; i < (*m); i++){
+        for (j = 0; j < (*n); j++){
+            fscanf(fp, "%lf", &(A[i][j]));
+        }
+    }
+
+    fclose(fp);
+    return A;
+}
+\end{lstlisting}
+
+\begin{lstlisting}
+double *readVector(char *path, int *m){
+    FILE *fp;
+    fp = fopen(path,"r");
+    int i;
+    fscanf(fp, "%d", m);
+
+    double *x = malloc((*m) * sizeof(double));
+
+    for(i = 0; i < (*m); i++){
+        fscanf(fp, "%lf", x+i);
+    }
+    fclose(fp);
+    return x;
+}
+\end{lstlisting}
+
+\subsubsection{Stampa del vettore risultante}
+\begin{lstlisting}
+void printVector(double *y,int m){
+    int i;
+    for(i = 0; i < m; i++){
+        printf("%f ", y[i]);
+    }
+    printf("\n");
+}
+\end{lstlisting}
