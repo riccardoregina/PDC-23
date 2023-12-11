@@ -1,8 +1,51 @@
+\subsection{Esecuzione su Cluster SCOPE}
 Il programma deve essere eseguito mediante un job script contenente direttive pbs (portable batch system).
 
 Un esempio di jobscript:
 \begin{lstlisting}
-INSERIRE SCRIPT PER OMP
+    #!/bin/bash
+    ##########################
+    # #
+    # The PBS directives #
+    # #
+    ##########################
+    #PBS -q <queue>
+    #PBS -l nodes=1:ppn=<core da utilizzare>
+    #PBS -N <file>
+    #PBS -o <file.out>
+    #PBS -e <file.err>
+    ##########################################
+    # -q coda su cui va eseguito il job #
+    # -l numero di nodi richiesti #
+    # -N nome job(stesso del file pbs) #
+    # -o, -e nome files contenente l’output #
+    ##########################################
+    
+    echo ------------------------------------------------------
+    echo 'Job is running on node:'
+    cat $PBS_NODEFILE
+    echo ------------------------------------------------------
+    PBS_O_WORKDIR=$PBS_O_HOME/FILE
+    echo ------------------------------------------------------
+    echo PBS: qsub is running on $PBS_O_HOST
+    echo PBS: originating queue is $PBS_O_QUEUE
+    echo PBS: executing queue is $PBS_QUEUE
+    echo PBS: working directory is $PBS_O_WORKDIR
+    echo PBS: execution mode is $PBS_ENVIRONMENT
+    echo PBS: job identifier is $PBS_JOBID
+    echo PBS: job name is $PBS_JOBNAME
+    echo PBS: node file is $PBS_NODEFILE
+    echo PBS: current home directory is $PBS_O_HOME
+    echo PBS: PATH = $PBS_O_PATH
+    echo ------------------------------------------------------
+    
+    export OMP_NUM_THREADS=2
+    export PSC_OMP_AFFINITY=TRUE
+    echo "Compilo..."
+    gcc -fopenmp -lgomp -o $PBS_O_WORKDIR/<file> $PBS_O_WORKDIR/<file.c>
+    echo "Eseguo..."
+    $PBS_O_WORKDIR/<file> [arguments]
+    echo ------------------------------------------------------
 \end{lstlisting}
 
 Una volta scritto il job script, per eseguirlo, bisognerà eseguire da terminale il comando 
@@ -10,10 +53,22 @@ Una volta scritto il job script, per eseguirlo, bisognerà eseguire da terminale
 qsub FILE.pbs
 \end{lstlisting}
 
-In caso l'esecuzione dello script vada a buon fine, verranno generati FILE.out e FILE.err, i file di output e errore rispettivamente.
+In caso l'esecuzione dello script vada a buon fine, verranno generati FILE.out e FILE.err, i file di output ed errore, rispettivamente.
 
 Per andare a visualizzare tali file, bisognerà eseguire da terminale i comandi
 \begin{lstlisting}
 cat FILE.err
 cat FILE.out
+\end{lstlisting}
+
+\subsection{Esecuzione su macchina personale}
+Poiché le macchine d'uso comune sono oramai, per la maggior parte, multicore, é possibile sfruttare il programma parallelo in esame su di esse.
+Per elaborare le direttive omp, bisogna aggiungere dei flag (-fopenmp -lgomp) in fase di compilazione del codice sorgente.
+Va quindi eseguito da terminale il comando:
+\begin{lstlisting}
+    gcc -fopenmp -lgomp <file.c> [-o <file>]
+\end{lstlisting}
+E poi, per l'esecuzione:
+\begin{lstlisting}
+    ./<file>
 \end{lstlisting}
