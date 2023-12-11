@@ -32,12 +32,13 @@ int main(){
 \end{lstlisting}
 
 \subsection{Algoritmo}
-La direttiva omp \textit{\#pragma} indica l'inizio di un blocco parallelo: essa genera un team di thread, sottoprocessi che condividono la stessa area di memoria. Pertanto, è importante specificare ai thread quali saranno le variabili condivise, accessibili a tutti e regolate da un semaforo di sistema, e quali private, sempre sovrascrivibili perché indipendenti. 
+La direttiva omp \textit{\#pragma} indica l'inizio di un blocco parallelo: il master thread (nato alla nascita del processo) genera un team di thread, sottoprocessi che condividono la stessa area di memoria. Pertanto, è importante specificare ai thread quali saranno le variabili condivise, accessibili a tutti e regolate da un semaforo di sistema, e quali private, sempre sovrascrivibili perché indipendenti. 
 
-Per decidere manualmente la visibilitá delle variabili é stata usata la direttiva \textit{default(none)}
-Le variabili condivise sono le dimensioni della matrice e dei vettori, che devono poter essere visualizzate in ogni istante della computazione da ciascun thread.
+Per decidere manualmente la visibilitá delle variabili é stata usata la direttiva \textit{default(none)}.
+Le variabili condivise sono: gli indirizzi di memoria della matrice A ($A$) e dei vettori ($x$ e $y$); le rispettive dimensioni ($m$, $n$) e ($n$, $m$), che devono poter essere visualizzate in ogni istante della computazione da ciascun thread.
 Le variabili private sono gli indici dei due cicli for innestati. Ogni thread compierà le proprie iterazioni indipendenti.
 Per la distribuzione delle iterazioni del for-statement, si è usata una specifica direttiva  standard di omp: \textit{\#pragma...for...}. 
+La fine del for-statement sancisce anche la fine della regione parallela: si verifica il ricongiungimento dei thread nel master thread.
 La funzione infine restituirà al main l'indirizzo di memoria del vettore risultante $y$.
 \begin{lstlisting}
 double *matrixVector(int m, int n, double *x, double **A){
