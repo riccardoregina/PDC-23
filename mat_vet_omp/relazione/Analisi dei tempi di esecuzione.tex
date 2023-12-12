@@ -3,7 +3,7 @@
 Nel calcolare il tempo di esecuzione di un algoritmo parallelo, la grandezza nota come complessità di tempo (utile nell'analisi del tempo di esecuzione di un algoritmo sequenziale) risulta poco indicativa.\\
 Infatti, in un algoritmo parallelo il numero delle operazioni non coincide più con il numero dei passi temporali. Di conseguenza si introducono nuove grandezze al fine di realizzare un'analisi degli algoritmi paralleli.
 
-Adattando i concetti del calcolo parallelo in calcolatori MIMD a memoria distribuita a quelli a memoria condivisa: se T che indica il numero di thread eseguibili parallelamente dai core della macchina, un problema che si risolve in un tempo t verrà risolto da T thread (idealmente) in $\frac{t}{T}$.
+Adattando i concetti del calcolo parallelo in calcolatori MIMD a memoria distribuita a quelli a memoria condivisa: se $T$ che indica il numero di thread eseguibili parallelamente dai core della macchina, un problema che si risolve in un tempo $t$ verrà risolto da $T$ thread (idealmente) in $\frac{t}{T}$.
 
 \subsection{Speed-up, Overhead ed Efficienza}
 
@@ -18,17 +18,17 @@ Si definisce \textbf{efficienza} il rapporto: $$ E(T) = \frac{S(T)}{T} $$
 
 \subsection{Modifiche al codice per la registrazione dei tempi}
 \subsubsection{Header file}
-Il linguaggio C fornisce un tipo built-in per gestire la grandezza fisica del tempo: time.
+Il linguaggio C fornisce un tipo built-in per gestire la grandezza fisica del tempo: $time$.
 La sua definizione é contenuta nel file header che segue e che pertanto deve essere incluso nel codice sorgente:
 \begin{lstlisting}
 #include <sys/time.h>
 \end{lstlisting}
 
 \subsubsection{Main}
-Il main delega il calcolo dell'effettivo algoritmo all'algoritmo stesso, passando la variabile time alla funzione matrixVector.
-La variabile numThreads é invece un discriminante per l'analisi finale dei dati.
-Sia time che numThreads verranno modificate a runtime dalla funzione matrixVector.
-Infine, invochiamo writeResultOnFile per registrare il risultato ottenuto.
+Il main delega il calcolo dell'effettivo algoritmo all'algoritmo stesso, passando la variabile time alla funzione $matrixVector$.
+La variabile $numThreads$ é invece un discriminante per l'analisi finale dei dati.
+Sia time che numThreads verranno modificate a runtime dalla funzione $matrixVector$.
+Infine, invochiamo $writeResultOnFile$ per registrare il risultato ottenuto.
 \begin{lstlisting}
     int main(){
         double time;
@@ -54,12 +54,13 @@ Infine, invochiamo writeResultOnFile per registrare il risultato ottenuto.
     }
 \end{lstlisting}
 
-\subsubsection{Algoritmo}
-La variabile numThreads viene inizializzata con il valore restituito dalla funzione omp_get_max_threads(), una funzione della libreria omp che restituisce il massimo numero di thread disponibili per la successiva regione parallela.
-Ai fini del calcolo del tempo d'esecuzione, ci serviamo della funzione gettimeofday, che restituisce un oggetto di tipo struct timeval, contenente il clock, il giorno di sistema ed altre informazioni.
-Alla prima chiamata a gettimeofday, salviamo il valore in secondi nella variabile timeStart, mentre alla seconda, salviamo in timeEnd.
-L'istruzione "t.tv_sec+(t.tv_usec / 1000000.0)" somma i secondi conservati da t ai microsecondi conservati da t divisi per 1000000 (i microsecondi vengono riscalati a secondi).
-Assegniamo al parametro time il la differenza tra timeEnd e timeStart.
+\subsection{Algoritmo}
+
+La variabile numThreads viene inizializzata con il valore restituito dalla funzione $omp\_get\_max\_threads()$, una funzione della libreria omp che restituisce il massimo numero di thread disponibili per la successiva regione parallela.
+Ai fini del calcolo del tempo d'esecuzione, ci serviamo della funzione $gettimeofday$, che restituisce un oggetto di tipo struct timeval, contenente il clock, il giorno di sistema ed altre informazioni.
+Alla prima chiamata a $gettimeofday$, salviamo il valore in secondi nella variabile $timeStart$, mentre alla seconda, salviamo in $timeEnd$.
+L'istruzione che inizializza la variabile $timeStart$ somma i secondi conservati da t ai microsecondi conservati da t divisi per 1000000 (i microsecondi vengono riscalati a secondi).
+Assegniamo al parametro time il la differenza tra $timeEnd$ e $timeStart$.
 \begin{lstlisting}
     double *matrixVector(int m, int n, double *x, double **A, double *time, int *numThreads){
         (*numThreads) = omp_get_max_threads();
@@ -100,7 +101,7 @@ Segue la definizione della funzione invocata alla fine del main: writeResultOnFi
 
 \subsection{Dati empirici}
 L'algoritmo è stato testato in più condizioni e secondo i parametri precedentemente descritti.
-É stato fissata una dimensione di 1000x1000 per la matrice in input e di 1000 per il vettore.
+É stato fissata una dimensione di 10000x10000 per la matrice in input e di 1000 per il vettore.
 Il numero di thread é variato da 1 a 8, tenendo conto delle sole potenze di 2.
 
 \begin{table}[htp]
@@ -110,11 +111,12 @@ Il numero di thread é variato da 1 a 8, tenendo conto delle sole potenze di 2.
   hlines,
   vlines,
 }
-Threads & Tempo ($\cdot 10^{-3} s$) & Speed Up & Efficienza & Overhead ($\cdot 10^{-3} s$) \\
-1          & x   & x    & x       & x                     \\
-2          & x   & x    & x       & x                     \\
-4          & x   & x    & x       & x                     \\
-8          & x   & x    & x       & x                     
+Threads & Tempo ($\cdot 10^{-1} s$) & Speed Up & Efficienza & Overhead ($\cdot 10^{-1} s$) \\
+1          & 9.606   & x    & x       & x                     \\
+2          & 4.859   & 1.977    & 0.988       & 0.12                     \\
+4          & 2.506   & 3.83    & 0.957       & 0.14                     \\
+8          & 1.402   & 6.851    & 0.856       & 1.61                     \\
+16         & 1.562   & -    & -       & -
 \end{tblr}
 \end{table}
 
@@ -124,16 +126,17 @@ Threads & Tempo ($\cdot 10^{-3} s$) & Speed Up & Efficienza & Overhead ($\cdot 1
 Il grafico dei tempi:
 \begin{figure}[h!tbp]
     \centering
-    \includegraphics[width=1\linewidth]{Tempi.png}
+    \includegraphics[width=1\linewidth]{tempi.png}
     \caption{Andamento dei tempi}
     \label{fig:enter-label}
 \end{figure}
+Si noti come, con 16 thread, il tempo sia peggiorato. Questo è stato previsto poiché la macchina su cui si è effettuato il test poteva eseguire al più 8 thread contemporaneamente. Eseguirne più di 8 ha causato quindi un collo di bottiglia.
 
 \newpage
 Visualizziamo la curva, confrontandola all'andamento dello speed-up ideale:
 \begin{figure}[h!tbp]
     \centering
-    \includegraphics[width=1\linewidth]{SpeedUp.png}
+    \includegraphics[width=1\linewidth]{speedup.png}
     \caption{Andamento dello Speed Up}
     \label{fig:enter-label}
 \end{figure}
@@ -142,7 +145,7 @@ Visualizziamo su un grafico anche i valori dell'Overhead:
 
 \begin{figure}[h!tbp]
     \centering
-    \includegraphics[width=1\linewidth]{Overhead.png}
+    \includegraphics[width=1\linewidth]{overhead.png}
     \caption{Andamento dell'Overhead}
     \label{fig:enter-label}
 \end{figure}
@@ -152,7 +155,7 @@ Visualizziamo su un grafico anche i valori dell'Overhead:
 Infine osserviamo come varia la nostra efficienza:
 \begin{figure}[h!tbp]
     \centering
-    \includegraphics[width=1\linewidth]{Efficienza.png}
+    \includegraphics[width=1\linewidth]{efficienza.png}
     \caption{Andamento dell'efficienza}
     \label{fig:enter-label}
 \end{figure}
