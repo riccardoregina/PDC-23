@@ -1,0 +1,200 @@
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.1400480270 secondi) 
+Numero di thread nel team: 8
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.1391839981 secondi) 
+Numero di thread nel team: 8
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.1374719143 secondi) 
+Numero di thread nel team: 8
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.1414699554 secondi) 
+Numero di thread nel team: 8
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.1412007809 secondi) 
+Numero di thread nel team: 8
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.1386599541 secondi) 
+Numero di thread nel team: 8
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.1398489475 secondi) 
+Numero di thread nel team: 8
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.1407439709 secondi) 
+Numero di thread nel team: 8
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.1435060501 secondi) 
+Numero di thread nel team: 8
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.2492601871 secondi) 
+Numero di thread nel team: 4
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.2516298294 secondi) 
+Numero di thread nel team: 4
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.2485809326 secondi) 
+Numero di thread nel team: 4
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.2506980896 secondi) 
+Numero di thread nel team: 4
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.2534379959 secondi) 
+Numero di thread nel team: 4
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.2490570545 secondi) 
+Numero di thread nel team: 4
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.2507119179 secondi) 
+Numero di thread nel team: 4
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.2516019344 secondi) 
+Numero di thread nel team: 4
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.4872138500 secondi) 
+Numero di thread nel team: 2
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.4846379757 secondi) 
+Numero di thread nel team: 2
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.4855210781 secondi) 
+Numero di thread nel team: 2
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.4921748638 secondi) 
+Numero di thread nel team: 2
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.4844889641 secondi) 
+Numero di thread nel team: 2
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.4858829975 secondi) 
+Numero di thread nel team: 2
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.4821350574 secondi) 
+Numero di thread nel team: 2
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.4848668575 secondi) 
+Numero di thread nel team: 2
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.9582228661 secondi) 
+Numero di thread nel team: 1
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.9605140686 secondi) 
+Numero di thread nel team: 1
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.9589848518 secondi) 
+Numero di thread nel team: 1
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.9589519501 secondi) 
+Numero di thread nel team: 1
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.9633810520 secondi) 
+Numero di thread nel team: 1
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.9614229202 secondi) 
+Numero di thread nel team: 1
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.9630348682 secondi) 
+Numero di thread nel team: 1
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.1461060047 secondi) 
+Numero di thread nel team: 16
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.1504390240 secondi) 
+Numero di thread nel team: 16
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.1569008827 secondi) 
+Numero di thread nel team: 16
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.1702690125 secondi) 
+Numero di thread nel team: 16
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.1554300785 secondi) 
+Numero di thread nel team: 16
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.1514248848 secondi) 
+Numero di thread nel team: 16
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.1610519886 secondi) 
+Numero di thread nel team: 16
+
+
+Dimensione in Input: 10000x10000 
+Tempo di esecuzione: (0.1577539444 secondi) 
+Numero di thread nel team: 16
+
+
