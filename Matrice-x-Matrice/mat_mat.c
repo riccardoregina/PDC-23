@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpi.h>
+#include "mpi.h"
 
 int main(){
     float **A;
@@ -26,10 +26,6 @@ int main(){
     MPI_Comm rows,cols;
     extrapolate_row_column_comm(grid,&rows,&cols);
 
-    //algoritmo vero e proprio
-
-    ...distribuzione...
-
     int i,j;
     int grid_rank;
 
@@ -39,12 +35,17 @@ int main(){
     MPI_Cart_coords(grid, grid_rank, 2, coords);
 
     int blockSize=n/m;
+
+    //Distribuzione
     
-    A_local_temp=
-    A_local=         //allochiamo A  B  e C secondo blockSize
-    B_local=
-    C_local= //inizializzare a 0
-    C_local_temp= 
+    //allochiamo A  B  e C secondo blockSize
+    A_local_temp= allocMatrix(blockSize, blockSize);
+    A_local= allocMatrix(blockSize, blockSize);
+    B_local= allocMatrix(blockSize, blockSize);
+    C_local= allocMatrix(blockSize, blockSize);  //inizializzare a 0
+    C_local = initMatrix(blockSize, blockSize);
+    C_local_temp= allocMatrix(blockSize, blockSize);
+    
     
     if(coords[0]==0 && coords[1]==0){
         
@@ -55,10 +56,13 @@ int main(){
             for(j=0;j<m;j++){
 
                 if(i==0 && j==0){
-                    riempi A_local da A
+                    //riempi A_local da A
+                    A_local = createSubmatrix(A, blockSize, offsetRow, offsetCol);
                 }
                 else{
-                    crea SottoMatrice secondo l offset
+                    //crea SottoMatrice secondo l offset
+                    float** toSend = createSubmatrix(A, blockSize, offsetRow, offsetCol);
+                    //...
                     MPI_Send(const void *buf, int count, MPI_Datatype datatype, (i*m)+j, (i*m)+j+20, grid); //opzione A: mandiamo blockSize vettori. opzioneB:creare ogni volta datatype a seconda dell offset
                 }
                 offsetCol+=blockSize;
@@ -70,6 +74,7 @@ int main(){
         MPI_Recv(A_local, int count, MPI_Datatype datatype, 0, grid_rank+20, grid, &status); //opzione A: riceviamo blockSize vettori. opzioneB: riceviamo il sottoblocco diretto
     }
 
+    // Inizio dell'algoritmo di Fox
     
     for(i=0;i<m;i++){ //l algoritmo di FOX finisce dopo m passi (scorro le diagonali)
 
@@ -84,7 +89,7 @@ int main(){
             C_local_temp=matrixMultiplication(A_local_temp,B_local);
         }
 
-        C_local=addMatrix(C_local,C_local_temp);
+        C_local=addMatrix(C_local,C_local_temp,blockSize);
         
 
         //mandiamo il blocco di B_locale ai processori sulla stessa colonna ma sulla riga precedente
@@ -160,3 +165,83 @@ int mod(a,m){
     }
 }
 
+float ** allocMatrix(int m, int n) {
+    float **M;
+
+    M = (float **) malloc(m*sizeof(float *));
+    if(M==NULL) {
+        //gestisciErrore(ERRORE_ALLOCAZIONE_MEMORIA);
+        free(M);
+        return NULL;
+    }
+
+    M[0] = (float *) malloc(m*n*sizeof(float));
+    if (M[0]==NULL) {
+        //gestisciErrore(ERRORE_ALLOCAZIONE_MEMORIA);
+        free(M[0]);
+        free(M);
+        return NULL;
+    }
+
+    for(int i=1; i<m; i++) {
+        M[i] = M[i-1] + n;
+    }
+
+    return M;
+}
+
+void freeMatrix(float **M) {
+    free(M[0]);
+    free(M);
+}
+
+float** initMatrix(float** A, int m, int n) {
+    int i, j;
+    for (i = 0; i < m; i++) {
+        for (j = 0; j < n; j++) {
+            A[i][j] = 0;
+        }
+    }
+    return A;
+}
+
+float** addMatrix(float** A, float** B, int size) {
+    int i, j;
+    for (i = 0; i < size; i++) {
+        for (j = 0; j < size; j++) {
+            A[i][j] += B[i][j];
+        }
+    }
+    return A;
+}
+
+float stdScalarProduct(float** A, float** B, const int i, const int j, int size) { //const per enfatizzare il loro non essere variabili in questo blocco.
+    int h, ret;
+    ret = 0;
+    for (h = 0; h < size; h++) {
+        ret += A[i][h] * B[h][j];
+    }
+    return ret;
+}
+
+float** matrixMultiplication(float** A, float** B, int size) {
+    float** C = allocMatrix(size, size);
+    int i, j, k;
+    for (i = 0; i < size; i++) {
+        for (j = 0; j < size; j++) {
+            C[i][j] = stdScalarProduct(A, B, i, j, size);
+        }
+    }
+    return C;
+}
+
+float** createSubmatrix(float** A, int size, int offsetRow, int offsetCol) {
+    float** R = allocMatrix(size, size);
+    int i, j;
+    for (i = offsetRow; i < size; i++) {
+        for (j = offsetCol; j < size; j++) {
+            R[i - offsetRow][j - offsetCol] = A[i][j];
+        }
+    }
+    return R;
+}
