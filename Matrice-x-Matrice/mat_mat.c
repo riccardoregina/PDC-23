@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "mpi.h"
 
+#define ERRORE_ALLOCAZIONE_MEMORIA 1
+
 int main(){
     float **A;
     float **B;
@@ -14,7 +16,6 @@ int main(){
 
     MPI_Comm_rank(MPI_COMM_WORLD,&pid);
     MPI_Comm_size(MPI_COMM_WORLD,&nproc);
-
     
     A=readMatrix("matrix1.txt",&n);
     B=readMatrix("matrix2.txt",&n);
@@ -39,6 +40,8 @@ int main(){
     //Distribuzione
     
     //allochiamo A  B  e C secondo blockSize
+
+    C=allocMatrix(n,n);
     A_local_temp= allocMatrix(blockSize, blockSize);
     A_local= allocMatrix(blockSize, blockSize);
     B_local= allocMatrix(blockSize, blockSize);
@@ -49,29 +52,33 @@ int main(){
     
     if(coords[0]==0 && coords[1]==0){
         
-        int offsetRow=0;
-        int offsetCol=0;
 
         for(i=0;i<m;i++){
             for(j=0;j<m;j++){
 
                 if(i==0 && j==0){
                     //riempi A_local da A
-                    A_local = createSubmatrix(A, blockSize, offsetRow, offsetCol);
+                    A_local = createSubmatrix(A, blockSize, 0, 0);
                 }
                 else{
-                    //crea SottoMatrice secondo l offset
-                    float** toSend = createSubmatrix(A, blockSize, offsetRow, offsetCol);
+                    
+                    //float** toSend = createSubmatrix(A, blockSize, offsetRow, offsetCol); non abbiamo bisogno di creare la sottomatrice da mandare
                     //...
-                    MPI_Send(const void *buf, int count, MPI_Datatype datatype, (i*m)+j, (i*m)+j+20, grid); //opzione A: mandiamo blockSize vettori. opzioneB:creare ogni volta datatype a seconda dell offset
-                }
-                offsetCol+=blockSize;
+                    MPI_Datatype blockMatrix;
+                    
+                    int sizes[2]    = {n,n};  
+                    int subsizes[2] = {blockSize,blockSize};  
+                    int starts[2]   = {i*blockSize,j*blockSize};  
+
+                    MPI_Type_create_subarray(2, sizes, subsizes, starts, MPI_ORDER_C, MPI_FLOAT, &blockMatrix);
+                    MPI_Type_commit(&blockMatrix);
+                    MPI_Send(&(A[0][0]), 1, blockMatrix, (i*m)+j, (i*m)+j+20, grid); //opzione A: mandiamo blockSize vettori. opzioneB:creare ogni volta datatype a seconda dell offset
+                }   
             }
-            offsetRow+=blockSize;
         }
     }
     else{
-        MPI_Recv(A_local, int count, MPI_Datatype datatype, 0, grid_rank+20, grid, &status); //opzione A: riceviamo blockSize vettori. opzioneB: riceviamo il sottoblocco diretto
+        MPI_Recv(&(A_local[0][0]), blockSize*blockSize, MPI_FLOAT, 0, grid_rank+20, grid, &status); //opzione A: riceviamo blockSize vettori. opzioneB: riceviamo il sottoblocco diretto
     }
 
     // Inizio dell'algoritmo di Fox
@@ -80,13 +87,22 @@ int main(){
 
         //mandiamo il blocco di A_locale ai processori sulla stessa riga
 
-        int source=(coords[0]*m)+ ((coords[0]+i) % m); //espressione algebrica per trovare il processore sulla diagonale di riferimento
-        MPI_Bcast( A_local, int count, MPI_Datatype datatype, source, rows);
+        if(coords[0]==mod(coords[1]-i,m)){ //se sono sulla diagonale
+            for(j=0;j<m;j++){
+                int dest=coords[0]*m + j;
+                if(dest!=grid_rank){                                                                //esegui le send sulla riga
+                    MPI_Send(&(A_local[0][0]), blockSize*blockSize, MPI_FLOAT, dest, dest+80,grid);
+                }
+            }
+        }
+        else{
+            MPI_Recv(&(A_local_temp[0][0]), blockSize*blockSize, MPI_FLOAT, coords[0]*m + mod(coords[0]+i,blockSize), grid_rank+80, grid, &status); //ricevi sulla tua riga 
+        }
 
-        if(grid_rank==source){
-            C_local_temp=matrixMultiplication(A_local,B_local);
+        if(coords[0]==mod(coords[1]-i,m)){ //se sono sulla diagonale
+            C_local_temp=matrixMultiplication(A_local,B_local);         //ho quello che mi serve in A_local
         }else{
-            C_local_temp=matrixMultiplication(A_local_temp,B_local);
+            C_local_temp=matrixMultiplication(A_local_temp,B_local);    //altrimenti lo ho in A_local_temp
         }
 
         C_local=addMatrix(C_local,C_local_temp,blockSize);
@@ -94,8 +110,8 @@ int main(){
 
         //mandiamo il blocco di B_locale ai processori sulla stessa colonna ma sulla riga precedente
 
-        MPI_Send(B_local, int count, MPI_Datatype datatype, mod(coords[0]-1,m)*m + coords[1], mod(coords[0]-1,m)*m + coords[1]+20, grid);
-        MPI_Recv(B_local, int count, MPI_Datatype datatype, mod(coords[0]+1,m)*m + coords[1], grid_rank+20, grid, &status);
+        MPI_Send(&(B_local[0][0]), blockSize*blockSize, MPI_FLOAT, mod(coords[0]-1,m)*m + coords[1], mod(coords[0]-1,m)*m + coords[1]+20, grid);
+        MPI_Recv(&(B_local[0][0]), blockSize*blockSize, MPI_FLOAT, mod(coords[0]+1,m)*m + coords[1], grid_rank+20, grid, &status);
 
     }         
 
@@ -170,14 +186,14 @@ float ** allocMatrix(int m, int n) {
 
     M = (float **) malloc(m*sizeof(float *));
     if(M==NULL) {
-        //gestisciErrore(ERRORE_ALLOCAZIONE_MEMORIA);
+        gestisciErrore(ERRORE_ALLOCAZIONE_MEMORIA);
         free(M);
         return NULL;
     }
 
     M[0] = (float *) malloc(m*n*sizeof(float));
     if (M[0]==NULL) {
-        //gestisciErrore(ERRORE_ALLOCAZIONE_MEMORIA);
+        gestisciErrore(ERRORE_ALLOCAZIONE_MEMORIA);
         free(M[0]);
         free(M);
         return NULL;
@@ -244,4 +260,14 @@ float** createSubmatrix(float** A, int size, int offsetRow, int offsetCol) {
         }
     }
     return R;
+}
+
+void gestisciErrore(int code){
+    switch(code){
+        case ERRORE_ALLOCAZIONE_MEMORIA:
+            printf("Errore nell allocazione della matrice in memoria");
+            exit(-1);
+        default:
+            exit(-1);
+    }
 }
