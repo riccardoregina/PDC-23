@@ -1,0 +1,59 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage[export]{adjustbox}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{tabularray}
+\usepackage{hyperref}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{
+frame=tb,
+language=C,
+aboveskip=3mm,
+belowskip=3mm,
+showstringspaces=false,
+columns=flexible,
+basicstyle={\small\ttfamily},
+numbers=none,
+numberstyle=\tiny\color{gray},
+keywordstyle=\color{blue},
+commentstyle=\color{dkgreen},
+stringstyle=\color{mauve},
+breaklines=true,
+breakatwhitespace=true,
+tabsize=3
+}
+
+\title{Algoritmo parallelo per il prodotto matrice-matrice}
+\author{Puggioni Riccardo, Regina Riccardo, Trotti Francesco }
+\date{December 2023}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+\tableofcontents
+
+\newpage
+\section{Introduzione al problema}
+    \input{introduzione}
+
+\section{Implementazione dell'algoritmo}
+    \input{Codice}
+
+\section{Analisi dei tempi di esecuzione}
+    \input{Analisi dei tempi di esecuzione}
+
+\section{Modalità d'uso}
+    \input{modalitaUso}
+
+\section{Esempi d'uso}
+    %\input{esempiUso}
+
+\end{document}
