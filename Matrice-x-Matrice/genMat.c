@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
     
     int i;
     for (i = 0; i < dimMatrix; i++) {
-        fprintf(fp, "%f ", rand() % MOD);
+        fprintf(fp, "%f ", ((double)rand() / RAND_MAX) * MOD);
     }
 
     fclose(fp);
