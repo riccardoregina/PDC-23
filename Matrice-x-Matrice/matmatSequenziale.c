@@ -25,7 +25,7 @@ int main() {
     gettimeofday(&t,NULL);
     double start=t.tv_sec+(t.tv_usec/1000000.0);//prendo i tempi iniziali
 
-    for (i = 0; i < n; j++) {
+    for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
             C[i][j] = stdScalarProduct(A, B, i, j, n);
         }
