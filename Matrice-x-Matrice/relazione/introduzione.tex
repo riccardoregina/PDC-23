@@ -26,7 +26,7 @@ Tra queste, é stata scelta la quarta, anche nota come algoritmo di Fox o BMR (B
 
 In primis, disponiamo virtualmente i processi secondo una topologia a griglia. Adesso, un processo avrá un indice di riga e di colonna.
 
-Dividiamo le matrici in blocchi quadrati: verranno creati delle sottomatrici $A_{ij}$, $B_{ij}$, $C_{ij}$, che verranno assegnate ai processi in posizione $ij$ nella griglia.
+Dividiamo le matrici in blocchi quadrati: verranno create delle sottomatrici $A_{ij}$, $B_{ij}$, $C_{ij}$, che verranno assegnate ai processi in posizione $ij$ nella griglia.
 
 Supponiamo di avere una griglia 3x3 di processi. Allora ciascuna matrice (A,B,C) verrá suddivisa in 9 sottomatrici.
 
@@ -78,7 +78,7 @@ A questo punto, avendo capito il pattern, generalizziamo l'algoritmo:
 \begin{lstlisting}
     for k from 0 to p-1 do
         //controllo se sono un processo sulla diagonale attuale
-        if coord_y = (coord_x+k)mod p
+        if coord_y = (coord_x+k)mod p then
             broadcast A_local to x-th row processes
         else
             receive into A_local_temp from process in position (coord_x, (coord_x+k)mod p)

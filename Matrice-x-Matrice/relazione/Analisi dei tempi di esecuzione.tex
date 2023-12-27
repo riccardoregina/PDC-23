@@ -21,7 +21,7 @@ Si definisce \textbf{efficienza} il rapporto: $$ E(p) = \frac{S(p)}{p} $$
 \subsection{Dati empirici}
 L'algoritmo è stato testato in più condizioni e secondo i parametri precedentemente descritti.
 
-Avendo fissato ad un milione la dimensione del problema ed avendo fatto variare il numero di processori da 2 a 8 (per il caso di singolo processore, si è deciso di eseguire l'algoritmo sequenziale per la somma), tenendo conto esclusivamente delle potenze di 2, sono stati ottenuti i seguenti risultati:
+Avendo fissato a 100 il numero di righe/colonne ed avendo fatto variare il numero di processori da 1 a 9 (per il caso di singolo processore, si è deciso di eseguire l'algoritmo sequenziale per il prodotto matrice-matrice), tenendo conto esclusivamente dei quadrati perfetti, sono stati ottenuti i seguenti risultati:
 
 \begin{table}[htp]
 \centering
@@ -31,8 +31,8 @@ Avendo fissato ad un milione la dimensione del problema ed avendo fatto variare 
 }
 Processi & Tempo ($\cdot 10^{-3} s$) & Speed Up & Efficienza & Overhead ($\cdot 10^{-3} s$) \\
 1          & x   & -    & -       & -                     \\
-2          & -   & -    & -       & -                     \\
-4          & -   & -    & -       & -                     \\             
+4          & -   & -    & -       & -                     \\
+9          & -   & -    & -       & -                     \\             
 \end{tblr}
 \end{table}
 
