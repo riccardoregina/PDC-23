@@ -78,7 +78,7 @@ A questo punto, avendo capito il pattern, generalizziamo l'algoritmo:
 \begin{lstlisting}
     for k from 0 to p-1 do
         //controllo se sono un processo sulla diagonale attuale
-        if coord_y = (coord_x+k)mod p then
+        if coord_x = (coord_y-k)mod p then
             broadcast A_local to x-th row processes
         else
             receive into A_local_temp from process in position (coord_x, (coord_x+k)mod p)
