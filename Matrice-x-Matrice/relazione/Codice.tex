@@ -20,6 +20,7 @@ int main(int argc, char *argv[]) {
   MPI_Init(&argc, &argv);
 
   MPI_Status status;
+  MPI_Request request;
 
   MPI_Comm_rank(MPI_COMM_WORLD, &pid);
   MPI_Comm_size(MPI_COMM_WORLD, &nproc);
@@ -45,23 +46,27 @@ int main(int argc, char *argv[]) {
 
   double startTime, endTime, time, timetot;
 \end{lstlisting}
-A, B, C sono le matrici coinvolte nel calcolo.
-n é la dimensione delle suddette matrici, che abbiamo supposto quadrate.
-pid é l'identificativo di un processo all'interno del communicator MPI\_COMM\_WORLD.
-nproc é il numero di processi lanciati.
-L'invocazione di MPI\_Init sancisce l'inizio delle comunicazioni tra processi.
-status, di tipo MPI\_Status, rappresenta lo stato di un'operazione di MPI\_Recv.
-L'invocazione di MPI\_Comm\_rank assegna ad ogni processo il suo pid, mentre MPI\_Comm\_size rende noto ad ogni processo il numero di processi nel communicator.
-La funzione readMatrix, dato il path di un file, legge la dimensione della matrice in esso, aggiorna la variabile n nel main, restituisce una matrice allocata.
-m é la dimensione della griglia di processi che verrá creata.
-grid é un MPI\_Comm che viene inizializzato dalla funzione create\_grid\_communicator.
-i e j sono indici che verranno utilizzati in seguito.
-grid\_rank é l'identificativo di un processo nella griglia.
-L'invocazione di MPI\_Comm\_rank assegna a ciascun processo il suo grid\_rank.
-coords é il vettore delle coordinate di ciascun processo all'interno della griglia.
-La chiamata a MPI\_Cart\_coords assegnerá tali coordinate.
-blockSize é la dimensione delle sottomatrici delle matrici A, B, C.
-startTime, endTime, time, timetot sono le variabili utilizzate per la registrazione del tempo di esecuzione. Esse sono, rispettivamente, il valore dell'istante iniziale, dell'istante finale, l'intervallo effettivo tra i due istanti precedenti, il valore massimo tra i valori di time tra tutti i processi. 
+Una descrizione delle variabili:
+\begin{itemize}
+    \item A, B, C sono le matrici coinvolte nel calcolo.
+    \item n é la dimensione delle suddette matrici, che abbiamo supposto quadrate.
+    \item pid é l'identificativo di un processo all'interno del communicator MPI\_COMM\_WORLD.
+    \item nproc é il numero di processi lanciati.
+    \item L'invocazione di MPI\_Init sancisce l'inizio delle comunicazioni tra processi.
+    \item status, di tipo MPI\_Status, rappresenta lo stato di un'operazione di MPI\_Recv.
+    \item request, di tipo MPI\_Request, é il corrispettivo di status per i messaggi non bloccanti.
+    \item L'invocazione di MPI\_Comm\_rank assegna ad ogni processo il suo pid, mentre MPI\_Comm\_size rende noto ad ogni processo il numero di processi nel communicator.
+    \item La funzione readMatrix, dato il path di un file, legge la dimensione della matrice in esso, aggiorna la variabile n nel main, restituisce una matrice allocata.
+    \item m é la dimensione della griglia di processi che verrá creata.
+    \item grid é un MPI\_Comm che viene inizializzato dalla funzione create\_grid\_communicator.
+    \item i e j sono indici che verranno utilizzati in seguito.
+    \item grid\_rank é l'identificativo di un processo nella griglia.
+    \item L'invocazione di MPI\_Comm\_rank assegna a ciascun processo il suo grid\_rank.
+    \item coords é il vettore delle coordinate di ciascun processo all'interno della griglia.
+    \item La chiamata a MPI\_Cart\_coords assegnerá tali coordinate.
+    \item blockSize é la dimensione delle sottomatrici delle matrici A, B, C.
+    \item startTime, endTime, time, timetot sono le variabili utilizzate per la registrazione del tempo di esecuzione. Esse sono, rispettivamente, il valore dell'istante iniziale, dell'istante finale, l'intervallo effettivo tra i due istanti precedenti, il valore massimo tra i valori di time tra tutti i processi. 
+\end{itemize}
 
 \subsubsection{Distribuzione dei dati}
 \begin{lstlisting}
@@ -116,7 +121,7 @@ Il processo 0 calcola la posizione della sottomatrice da inviare a ciascun proce
 Gli altri processi ricevono le proprie sottomatrici dal processo 0.
 
 \subsubsection{Algoritmo BMR}
-Il seguente codice é non altro che l'implementazione in MPI dello pseudocodice descritto nella sezione introduttiva.
+Il seguente codice é non altro che l'implementazione in MPI dello pseudocodice descritto nella sezione introduttiva. Nota: é necessario che l'invio della matrice B\_local sia non bloccante (MPI\_Irecv). Altrimenti, i processi si bloccherebbero in attesa di una ricezione che non avverrá mai, poiché sono tutti a dover ricevere. Invece, per assicurarci che le operazioni all'iterazione successiva siano svolte con la matrice B\_local corretta, la ricezione di essa é bloccante (MPI\_Recv).
 \begin{lstlisting}
   double startTime = MPI_Wtime();
 
@@ -135,7 +140,7 @@ Il seguente codice é non altro che l'implementazione in MPI dello pseudocodice 
         }
       }
     } else {
-      int sorgente = (coords[0] * m) + (mod(coords[0] + i, blockSize));
+      int sorgente = (coords[0] * m) + (mod(coords[0] + i, m));
       MPI_Recv(&(A_local_temp[0][0]), blockSize * blockSize, MPI_FLOAT,
                sorgente, grid_rank + 80 * (i + 1), grid,
                &status); // ricevi sulla tua riga
@@ -156,9 +161,9 @@ Il seguente codice é non altro che l'implementazione in MPI dello pseudocodice 
     // mandiamo il blocco di B_locale ai processori sulla stessa colonna ma
     // sulla riga precedente
 
-    MPI_Send(&(B_local[0][0]), blockSize * blockSize, MPI_FLOAT,
+    MPI_Isend(&(B_local[0][0]), blockSize * blockSize, MPI_FLOAT,
              mod(coords[0] - 1, m) * m + coords[1],
-             mod(coords[0] - 1, m) * m + coords[1] + 100, grid);
+             mod(coords[0] - 1, m) * m + coords[1] + 100, grid, &request);
     MPI_Recv(&(B_local[0][0]), blockSize * blockSize, MPI_FLOAT,
              mod(coords[0] + 1, m) * m + coords[1], grid_rank + 100, grid,
              &status);
@@ -348,8 +353,7 @@ float **addMatrix(float **A, float **B, int size) {
 \subsubsection{Prodotto scalare standard}
 \begin{lstlisting}
 float stdScalarProduct(float **A, float **B, const int i, const int j,
-                       int size) { // const per enfatizzare il loro non essere
-                                   // variabili in questo blocco.
+                       int size) { // const per enfatizzare il loro non //essere variabili in questo blocco.
   int h, ret;
   ret = 0;
   for (h = 0; h < size; h++) {

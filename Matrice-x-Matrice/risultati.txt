@@ -1,4 +1,54 @@
+Dimensione in Input: 100x100 
+Tempo di esecuzione: (0.0132980347 secondi) 
+Numero di processori: 1
 
+
+Dimensione in Input: 100x100 
+Tempo di esecuzione: (0.0133500099 secondi) 
+Numero di processori: 1
+
+
+Dimensione in Input: 100x100 
+Tempo di esecuzione: (0.0134940147 secondi) 
+Numero di processori: 1
+
+
+Dimensione in Input: 100x100 
+Tempo di esecuzione: (0.0134000778 secondi) 
+Numero di processori: 1
+
+
+Dimensione in Input: 100x100 
+Tempo di esecuzione: (0.0132369995 secondi) 
+Numero di processori: 1
+
+
+Dimensione in Input: 100x100 
+Tempo di esecuzione: (0.0133280754 secondi) 
+Numero di processori: 1
+
+
+Dimensione in Input: 100x100 
+Tempo di esecuzione: (0.0134270191 secondi) 
+Numero di processori: 1
+
+
+Dimensione in Input: 100x100 
+Tempo di esecuzione: (0.0133759975 secondi) 
+Numero di processori: 1
+
+
+Dimensione in Input: 100x100 
+Tempo di esecuzione: (0.0133469105 secondi) 
+Numero di processori: 1
+
+
+Dimensione in Input: 100x100 
+Tempo di esecuzione: (0.0134580135 secondi) 
+Numero di processori: 1
+
+
+/////////////////////////////////
 
 dimensione matrice--->(100x100) 
 numero di processori--->4  matrice(2x2) 
@@ -124,6 +174,7 @@ dimensione matrice--->(100x100)
 numero di processori--->4  matrice(2x2) 
 tempo di esecuzione--->3.063917e-03 
 
+///////////////////////////////////
 
 dimensione matrice--->(90x90) 
 numero di processori--->9  matrice(3x3) 

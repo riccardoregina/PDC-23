@@ -12,7 +12,7 @@ Lo \textbf{speed-up} misura la riduzione del tempo di esecuzione rispetto all'al
 $$ S(P) = \frac{T(1)}{T(P)} $$ 
 
 
-La quantità che misura quanto il nostro speed up differisce da quello ideale è l'overhead. Si può quantificare con la seguente formula: $O_h(p) = pT(p) - T(1)$ .\\
+La quantità che misura quanto il nostro speed up differisce da quello ideale è l'overhead. Si può quantificare con la seguente formula: $O_h(p) = pT(p) - T(1)$.\\
 Riscrivendo lo speed up in funzione dell'overhead ci accogiamo infatti che lo speed up è ideale se e solo se l'overhead è nullo.\\
 
 Per poter misurare se e quanto è stato "sfruttato" il nostro ambiente di calcolo parallelo, si introduce l' \underline{efficienza} del nostro algoritmo.
@@ -21,7 +21,7 @@ Si definisce \textbf{efficienza} il rapporto: $$ E(p) = \frac{S(p)}{p} $$
 \subsection{Dati empirici}
 L'algoritmo è stato testato in più condizioni e secondo i parametri precedentemente descritti.
 
-Avendo fissato a 100 il numero di righe/colonne ed avendo fatto variare il numero di processori da 1 a 9 (per il caso di singolo processore, si è deciso di eseguire l'algoritmo sequenziale per il prodotto matrice-matrice), tenendo conto esclusivamente dei quadrati perfetti, sono stati ottenuti i seguenti risultati:
+Avendo fissato a 100 il numero di righe/colonne (nel test su 9 processi, si é fissato a 90) ed avendo fatto variare il numero di processori da 1 a 9 (per il caso di singolo processore, si è deciso di eseguire l'algoritmo sequenziale per il prodotto matrice-matrice), tenendo conto esclusivamente dei quadrati perfetti, sono stati ottenuti i seguenti risultati:
 
 \begin{table}[htp]
 \centering
@@ -30,9 +30,9 @@ Avendo fissato a 100 il numero di righe/colonne ed avendo fatto variare il numer
   vlines,
 }
 Processi & Tempo ($\cdot 10^{-3} s$) & Speed Up & Efficienza & Overhead ($\cdot 10^{-3} s$) \\
-1          & -   & x    & x       & x                     \\
-4          & -   & -    & -       & -                     \\
-9          & -   & -    & -       & -                     \\             
+1          & 13.37   & x    & x       & x                     \\
+4          & 2.971   & 4.500    & 1.125       & -1.486                     \\
+9          & 2.883   & 4.637    & 0.515       & 12.58                     \\
 \end{tblr}
 \end{table}
 
@@ -71,3 +71,9 @@ Infine osserviamo come varia l'efficienza:
     \caption{Andamento dell' efficienza}
     \label{fig:enter-label}
 \end{figure}
+
+Notiamo come lo speedUp calcolato per 4 processori abbia addirittura superato il valore ideale. Quest'ultimo é stato un valore inaspettato. Conseguenza di tale valore inaspettato é l'efficienza maggiore di quella ideale e l'Overhead negativo.
+
+Inoltre, le misurazioni con 9 processi sono da "prendere con le pinze" in quanto sul cluster su cui si sono svolti i test non c'é stata la possibilitá di far lavorare 9 nodi indipendenti, bensí solo 4: ció ha causato sicuramente un collo di bottiglia che ha fatto lievitare il tempo d'esecuzione, che, tuttavia, é lievemente piú basso del tempo misurato con 4 processi. 
+
+Misurazioni in ambienti consoni potrebbero dimostrare, molto probabilmente, che questo algoritmo é scalabile.
