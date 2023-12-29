@@ -1,0 +1,237 @@
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->2.755880e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->2.695084e-03 
+
+
+dimensione matrice--->(4x4) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->6.530285e-04 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->2.812147e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->3.262997e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->3.123045e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->2.839088e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->4.312038e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->2.746105e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->3.214121e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->2.653837e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->3.078938e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->2.846003e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->3.183126e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->3.273010e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->2.799034e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->3.391027e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->2.756119e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->2.757072e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->3.428936e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->2.735853e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->2.763987e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->3.408909e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->2.753019e-03 
+
+
+dimensione matrice--->(100x100) 
+numero di processori--->4  matrice(2x2) 
+tempo di esecuzione--->3.063917e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->3.421068e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->4.476786e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->6.202936e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->2.555847e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->3.164053e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->3.158092e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->3.280878e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->3.620863e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->3.239155e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->5.025864e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->3.150940e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->3.235102e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->3.103971e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->2.402067e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->2.717972e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->3.249168e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->2.007008e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->3.165960e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->2.930880e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->3.104925e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->3.380060e-03 
+
+
+dimensione matrice--->(90x90) 
+numero di processori--->9  matrice(3x3) 
+tempo di esecuzione--->3.418922e-03 
+
+

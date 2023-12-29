@@ -36,8 +36,8 @@ int main(int argc,char *argv[]){
     MPI_Comm_rank(MPI_COMM_WORLD,&pid);
     MPI_Comm_size(MPI_COMM_WORLD,&nproc);
     
-    A=readMatrix("/homes/DMA/PDC/2024/TRTFNC03B/mat_mat/matrix1.txt",&n);
-    B=readMatrix("/homes/DMA/PDC/2024/TRTFNC03B/mat_mat/matrix2.txt",&n);
+    A=readMatrix("/homes/DMA/PDC/2024/TRTFNC03B/mat_mat/matrice1.txt",&n);
+    B=readMatrix("/homes/DMA/PDC/2024/TRTFNC03B/mat_mat/matrice2.txt",&n);
 
     int m=sqrt(nproc); //suppongo che nproc sia un quadrato perfetto la cui radice divide n 
 
@@ -48,8 +48,10 @@ int main(int argc,char *argv[]){
     int i,j;
     int grid_rank;
 
-    MPI_Barrier(MPI_COMM_WORLD);
+    
     MPI_Comm_rank( grid, &grid_rank);
+
+    printf("sono il processo --->%d\n",grid_rank);
 
     int coords[2];
     MPI_Cart_coords(grid, grid_rank, 2, coords);
@@ -95,6 +97,8 @@ int main(int argc,char *argv[]){
 
                     MPI_Type_create_subarray(2, sizes, subsizes, starts, MPI_ORDER_C, MPI_FLOAT, &blockMatrix);
                     MPI_Type_commit(&blockMatrix);
+		    printf("sono %d mando a %d con tag %d la sottomatrice A\n",grid_rank,(i*m)+j,(i*m)+j+20);
+		    printf("sono %d mando a %d con tag %d la sottomatrice B\n",grid_rank,(i*m)+j,(i*m)+j+900);
                     MPI_Send(&(A[0][0]), 1, blockMatrix, (i*m)+j, (i*m)+j+20, grid); //dividamo e mandiamo la matrice A
                     MPI_Send(&(B[0][0]), 1, blockMatrix, (i*m)+j, (i*m)+j+900, grid); //dividiamo e mandiamo la matrice B
                 }
@@ -103,15 +107,23 @@ int main(int argc,char *argv[]){
         }
     }
     else{
+	printf("sono %d ricevo da %d con tag %d la sottomatrice A\n",grid_rank,0,grid_rank+20);
+	printf("sono %d ricevo da %d con tag %d la sottomatrice B\n",grid_rank,0,grid_rank+900);
         MPI_Recv(&(A_local[0][0]), blockSize*blockSize, MPI_FLOAT, 0, grid_rank+20, grid, &status); //riceviamo la sottomatrice di A in A_local
         MPI_Recv(&(B_local[0][0]), blockSize*blockSize, MPI_FLOAT, 0, grid_rank+900, grid, &status);//riceviamo la sottomatrice di B in B_local
     }
+
+    
+
+    printf("arrivati a distribuzione\n");
     
     
 
     // Inizio dell'algoritmo di Fox
 
     double startTime=MPI_Wtime();
+
+    printf("misuro tempo iniziale\n");
 
     for(i=0;i<m;i++){ //l algoritmo di FOX finisce dopo m passi (scorro le diagonali)
 
@@ -120,17 +132,20 @@ int main(int argc,char *argv[]){
         if(coords[0]==mod(coords[1]-i,m)){ //se sono sulla diagonale
             for(j=0;j<m;j++){
                 int dest=coords[0]*m + j;
-                if(dest!=grid_rank){        
+                if(dest!=grid_rank){
+		    printf("sono il processo (%d,%d) mando a %d con tag %d\n",coords[0],coords[1],dest,dest+80*(i+1));       
                     MPI_Send(&(A_local[0][0]), blockSize*blockSize, MPI_FLOAT, dest, dest+80*(i+1),grid); //manda A_local a tutti quelli della mia riga
                 }
             }
         }
         else{
-            int sorgente= (coords[0]*m) + (mod(coords[0]+i,blockSize));
+            int sorgente= (coords[0]*m) + (mod(coords[0]+i,m));
+	    printf("sono il processo (%d,%d) ricevo da %d con tag %d\n",coords[0],coords[1],sorgente,grid_rank+80*(i+1));   
             MPI_Recv(&(A_local_temp[0][0]), blockSize*blockSize, MPI_FLOAT, sorgente, grid_rank+80*(i+1), grid, &status); //ricevi sulla tua riga 
         }
         
-        
+        printf("arrivati a blocco di A\n");
+	
 
         if(coords[0]==mod(coords[1]-i,m)){ //se sono sulla diagonale
             C_local_temp=matrixMultiplication(A_local,B_local,blockSize);         //ho quello che mi serve in A_local
@@ -139,12 +154,22 @@ int main(int argc,char *argv[]){
         }
 
         C_local=addMatrix(C_local,C_local_temp,blockSize); //addizioniamo il risultato a quelli precendenti
+
+	printf("arrivati a Moltiplicazione Matrice\n");
         
 
         //mandiamo il blocco di B_locale ai processori sulla stessa colonna ma sulla riga precedente
 
-        MPI_Send(&(B_local[0][0]), blockSize*blockSize, MPI_FLOAT, mod(coords[0]-1,m)*m + coords[1], mod(coords[0]-1,m)*m + coords[1]+100, grid);
+	printf("sono il processo (%d,%d) mando B_local a %d con tag %d\n",coords[0],coords[1],mod(coords[0]-1,m)*m + coords[1],mod(coords[0]-1,m)*m + coords[1]+100);   
+
+       	MPI_Request req;
+	MPI_Isend(&(B_local[0][0]), blockSize*blockSize, MPI_FLOAT, mod(coords[0]-1,m)*m + coords[1], mod(coords[0]-1,m)*m + coords[1]+100, grid,&req);
+
+	printf("sono il processo (%d,%d) ricevo B_local da %d con tag %d\n",coords[0],coords[1],mod(coords[0]+1,m)*m + coords[1],grid_rank+100);
+
         MPI_Recv(&(B_local[0][0]), blockSize*blockSize, MPI_FLOAT, mod(coords[0]+1,m)*m + coords[1], grid_rank+100, grid, &status);
+
+	printf("arrivati a Ricezione di B\n");
 
     }
 
@@ -196,7 +221,7 @@ int main(int argc,char *argv[]){
 
     //scriviamo i risultati su file
     if(coords[0]==0&&coords[1]==0){
-        printResultsOnFile("risultati.txt",timetot,nproc,m,n);
+	  printResultsOnFile("/homes/DMA/PDC/2024/TRTFNC03B/mat_mat/risultati.txt",timetot,nproc,m,n);
     }
 
 
@@ -352,7 +377,7 @@ void printResultsOnFile(char *path,double t,int nproc,int m,int n){
 
     fprintf(fp,"dimensione matrice--->(%dx%d) \n",n,n);
     fprintf(fp,"numero di processori--->%d  matrice(%dx%d) \n",nproc,m,m);
-    fprintf(fp,"tempo di esecuzione--->%e \n\n",t);
+    fprintf(fp,"tempo di esecuzione--->%e \n\n\n",t);
 
     
     fclose(fp);
